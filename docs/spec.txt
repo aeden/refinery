@@ -1,0 +1,31 @@
+the event publisher
+  should publish one event to SQS for each service subscription
+    when the amount of time between now and the last event exceeds a service-specific threshold
+  should include enough info in the event so no additional db queries are required
+  should publish the event as JSON
+  should publish an event count to the monitor queue
+the server
+  should provide a runtime environment
+  should maintain a hash of daemons with their state
+  should monitor daemon health and watch for out of control daemons
+  should launch the a daemon when it receives a startup trigger from the monitor
+  should publish a heartbeat to its monitor queue with the number of current daemons
+the daemon
+  should remove an event from the queue and put -1 on the monitor queue
+  should pass the event to a handler for processing
+  should inform the runner that it has started processing
+  should inform the runner that is has finished processing
+  should log any errors
+  should log elapsed time
+  should post handler completion message to SQS
+the worker
+  should provide the business logic for processing one type of event
+  should be deployable on the fly without a runner restart
+  should batch all database writes
+  should write binary data directly to S3
+the monitor
+  should track how many items are in the event queue
+  should publish a startup trigger to the runner based on the queue size
+  should track how many daemons are running on each runner and publish add or remove daemon messages
+the chi.mp application
+  should post an event to a priority when requested by an owner
