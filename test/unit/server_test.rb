@@ -5,8 +5,24 @@ class ServerTest < Test::Unit::TestCase
       assert_not_nil RJob::Server.logger
     end
     context "logger" do
-      should "default to DEBUG level" do
-        assert_equal Logger::DEBUG, RJob::Server.logger.level
+      should "default to ERROR level" do
+        assert_equal Logger::ERROR, RJob::Server.logger.level
+      end
+    end
+  end
+  context "a server instance" do
+    setup do
+      @server = RJob::Server.new
+    end
+    should "have a config" do
+      assert_not_nil @server.config
+    end
+    should "be runnable" do
+      assert_nothing_raised do
+        thread = Thread.new do
+          @server.run
+        end
+        @server.stop
       end
     end
   end

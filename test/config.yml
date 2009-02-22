@@ -1,0 +1,5 @@
+initial_number_of_daemons: 2
+aws:
+  credentials:
+    access_key_id: "aaa"
+    secret_access_key: "bbb"

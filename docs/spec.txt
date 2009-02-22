@@ -6,7 +6,7 @@ the event publisher
   should publish an event count to the monitor queue
 the server
   should provide a runtime environment
-  should maintain a hash of daemons with their state
+  should maintain a collection of daemons with their state
   should monitor daemon health and watch for out of control daemons
   should launch the a daemon when it receives a startup trigger from the monitor
   should publish a heartbeat to its monitor queue with the number of current daemons
