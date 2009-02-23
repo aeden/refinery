@@ -16,6 +16,7 @@ class ConfigTest < Test::Unit::TestCase
         RJob::Config.default.aws.credentials
       end
     end
+    
     should "not raise a configuration error if aws credentials are set" do
       config = RJob::Config.new
       aws = config.aws
@@ -38,6 +39,9 @@ class ConfigTest < Test::Unit::TestCase
       should "have aws credentials" do
         assert_equal 'aaa', @config.aws.credentials['access_key_id']
         assert_equal 'bbb', @config.aws.credentials['secret_access_key']
+      end
+      should "having publishing settings" do
+        assert_equal 1, @config.publishing.length
       end
     end
   end

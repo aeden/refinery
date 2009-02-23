@@ -3,3 +3,6 @@ aws:
   credentials:
     access_key_id: "aaa"
     secret_access_key: "bbb"
+publishing:
+  sample:
+    delay: 10

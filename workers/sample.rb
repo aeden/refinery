@@ -1,11 +1,7 @@
 # This is a sample worker.
-class Sample < RJob::Worker
-  # Initialize the worker
-  def initialize
-    
-  end
+class SampleWorker < RJob::Worker
   # Execute the work once.
-  def execute
-    
+  def execute(message)
+    logger.info "received message: #{message}"
   end
 end

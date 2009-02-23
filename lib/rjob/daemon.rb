@@ -34,8 +34,8 @@ module RJob
       @thread = Thread.new do
         logger.info "Running thread"
         while(running?)
-          sleep(60)
-          logger.debug "ping"
+          #queue.receive()
+          sleep(10)
         end
         logger.info "Existing thread"
       end
