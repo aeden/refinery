@@ -1,6 +1,7 @@
 $:.unshift(File.dirname(__FILE__))
 
 require 'logger'
+require 'benchmark'
 
 require 'rubygems'
 require 'right_aws'
