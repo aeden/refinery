@@ -13,7 +13,7 @@ module Refinery #:nodoc:
     # into the queue associated with the publisher.
     def publish(message)
       logger.debug "Message: #{message.to_json}"
-      # @queue.send_message(Base64.encode64(message.to_json))
+      @queue.send_message(Base64.encode64(message.to_json))
     end
   end
 end

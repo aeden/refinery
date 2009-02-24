@@ -9,3 +9,5 @@ processors:
     queue: 'sample' # can be omitted
     publisher:
       delay: 5
+    workers:
+      initial: 3

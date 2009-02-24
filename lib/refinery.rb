@@ -8,11 +8,15 @@ require 'json'
 
 require 'refinery/loggable'
 require 'refinery/configurable'
+require 'refinery/queueable'
+
+require 'refinery/utilities'
 
 require 'refinery/config'
 require 'refinery/heartbeat'
 require 'refinery/server'
 require 'refinery/daemon'
+require 'refinery/worker'
 require 'refinery/event_publisher'
 require 'refinery/publisher'
 

@@ -4,6 +4,8 @@ module Refinery #:nodoc:
   class Server
     include Refinery::Loggable
     include Refinery::Configurable
+    include Refinery::Queueable
+    include Refinery::Utilities
     
     # Get a server-wide logger
     def self.logger
@@ -44,10 +46,16 @@ module Refinery #:nodoc:
     
     private
     def execute_daemons
-      1.upto(config[:server][:initial_number_of_daemons]) do |daemon_number|
-        daemons << Refinery::Daemon.start(self, daemon_number)
+      config['processors'].each do |key, settings|
+        logger.info "Creating daemons for #{key}"
+        queue_name = settings['queue'] || key
+        logger.debug "Using queue #{queue_name}"
+        queue = sqs.queue(queue_name)
+        1.upto(settings['workers']['initial']) do
+          daemons << Refinery::Daemon.new(self, key, queue)
+        end
+        logger.info "Running #{daemons.length} daemons"
       end
-      logger.info "Running #{daemons.length} daemons"
       
       Heartbeat.new(self)
       
