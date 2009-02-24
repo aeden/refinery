@@ -1,4 +1,5 @@
-module Refinery
+module Refinery #:nodoc:
+  # A heartbeat publisher that indicates a server is alive.
   class Heartbeat
     include Refinery::Loggable
     include Refinery::Configurable

@@ -31,7 +31,7 @@ module Refinery #:nodoc:
       state == RUNNING
     end
     
-    # A hash of all publishers instantiated.
+    # A hash of all publisher classes mapped to last modified timestamps.
     def publishers
       @publishers ||= {}
     end

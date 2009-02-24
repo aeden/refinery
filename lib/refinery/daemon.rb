@@ -1,4 +1,5 @@
-module Refinery
+module Refinery #:nodoc:
+  # A daemon provides a thread to run workers in.
   class Daemon
     include Refinery::Loggable
     include Refinery::Configurable
@@ -30,6 +31,11 @@ module Refinery
       state == RUNNING
     end
     
+    # Initialize the daemon.
+    #
+    # * <tt>server</tt>: The server instance
+    # * <tt>key</tt>: The processor key (i.e. its name)
+    # * <tt>queue</tt>: The queue to read from
     def initialize(server, key, queue)
       Refinery::Server.logger.info "Starting daemon"
       @server = server
@@ -48,6 +54,7 @@ module Refinery
       end
     end
     
+    # A hash of worker classes
     def workers
       @workers ||= {}
     end

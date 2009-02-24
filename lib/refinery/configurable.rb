@@ -1,4 +1,4 @@
-module Refinery
+module Refinery #:nodoc:
   # Include this module to get access to a shared configuration
   module Configurable
     def config
