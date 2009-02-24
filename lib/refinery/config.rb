@@ -1,4 +1,4 @@
-module RJob #:nodoc:
+module Refinery #:nodoc:
   # Configuration class.
   class Config
     attr_accessor :initial_number_of_daemons
@@ -9,7 +9,7 @@ module RJob #:nodoc:
       @default ||= new
     end
 
-    # Get the initial number of daemons to start when RJob launches
+    # Get the initial number of daemons to start when Refinery launches
     def initial_number_of_daemons
       @initial_number_of_daemons ||= 3
     end

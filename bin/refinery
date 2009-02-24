@@ -2,11 +2,11 @@
 
 # == Synopsis
 #
-# rjob: run the RJob server
+# refinery: run the Refinery server
 #
 # == Usage
 #
-# rjob [OPTION]
+# refinery [OPTION]
 #
 # -h, --help:
 #    show help
@@ -19,7 +19,7 @@
 
 require 'getoptlong'
 require 'rdoc/usage'
-require File.dirname(__FILE__) + '/../lib/rjob'
+require File.dirname(__FILE__) + '/../lib/refinery'
 
 options = {}
 opts = GetoptLong.new(
@@ -38,4 +38,4 @@ opts.each do |opt, arg|
   end
 end
 
-RJob::Server.new(options).run
+Refinery::Server.new(options).run

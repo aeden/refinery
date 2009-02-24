@@ -1,8 +1,8 @@
-module RJob
+module Refinery
   # Include this module to get access to the server logger
   module Loggable
     def logger
-      @logger ||= RJob::Server.logger
+      @logger ||= Refinery::Server.logger
     end
   end
 end

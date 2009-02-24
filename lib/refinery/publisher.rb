@@ -1,7 +1,7 @@
-module RJob #:nodoc:
+module Refinery #:nodoc:
   # Base class for publishers to be implemented by subclasses.
   class Publisher
-    include RJob::Loggable
+    include Refinery::Loggable
     
     # Initialize the publisher
     def initialize(queue)

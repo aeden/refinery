@@ -1,7 +1,7 @@
-module RJob
+module Refinery
   class Daemon
-    include RJob::Loggable
-    include RJob::Configurable
+    include Refinery::Loggable
+    include Refinery::Configurable
     
     RUNNING = 'running'
     STOPPED = 'stopped'
@@ -12,7 +12,7 @@ module RJob
     
     # Start the daemon
     def self.start(server, daemon_number)
-      RJob::Server.logger.info "Starting daemon #{daemon_number}"
+      Refinery::Server.logger.info "Starting daemon #{daemon_number}"
       new(server, daemon_number)
     end
     

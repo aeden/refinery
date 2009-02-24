@@ -1,4 +1,4 @@
-class Sample < RJob::Publisher
+class Sample < Refinery::Publisher
   def execute
     publish(['execute', {'something' => true}])
   end

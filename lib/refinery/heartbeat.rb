@@ -1,7 +1,7 @@
-module RJob
+module Refinery
   class Heartbeat
-    include RJob::Loggable
-    include RJob::Configurable
+    include Refinery::Loggable
+    include Refinery::Configurable
     def initialize(server)
       @server = server
       @thread = Thread.new do

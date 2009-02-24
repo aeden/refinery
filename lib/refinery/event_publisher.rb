@@ -1,7 +1,7 @@
-module RJob
+module Refinery
   class EventPublisher
-    include RJob::Loggable
-    include RJob::Configurable
+    include Refinery::Loggable
+    include Refinery::Configurable
     
     RUNNING = 'running'
     STOPPED = 'stopped'

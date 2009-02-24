@@ -3,22 +3,22 @@ require File.dirname(__FILE__) + '/../test_helper'
 class ConfigTest < Test::Unit::TestCase
   context "the config class" do
     should "provide a default configuration" do
-      assert_not_nil RJob::Config.default
+      assert_not_nil Refinery::Config.default
     end
     context "defaults" do
       should "have an initial_number_of_daemons" do
-        assert_equal 3, RJob::Config.default.initial_number_of_daemons
+        assert_equal 3, Refinery::Config.default.initial_number_of_daemons
       end
     end
     
     should "raise a configuration error if aws credentials are not set" do
-      assert_raise RJob::ConfigurationError do
-        RJob::Config.default.aws.credentials
+      assert_raise Refinery::ConfigurationError do
+        Refinery::Config.default.aws.credentials
       end
     end
     
     should "not raise a configuration error if aws credentials are set" do
-      config = RJob::Config.new
+      config = Refinery::Config.new
       aws = config.aws
       credentials = {
         'access_key_id' => 'xxx',
@@ -30,7 +30,7 @@ class ConfigTest < Test::Unit::TestCase
     
     context "after loading configuration from a YAML file" do
       setup do
-        @config = RJob::Config.new
+        @config = Refinery::Config.new
         @config.load_file(File.dirname(__FILE__) + '/../config.yml')
       end
       should "have the correct value for initial_number_of_daemons" do

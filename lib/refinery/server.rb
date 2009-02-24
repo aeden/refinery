@@ -1,9 +1,9 @@
-module RJob #:nodoc:
+module Refinery #:nodoc:
   # The server instance provides a runtime environment for daemons.
-  # To start the server create an RJob::Server instance and invole run.
+  # To start the server create an Refinery::Server instance and invole run.
   class Server
-    include RJob::Loggable
-    include RJob::Configurable
+    include Refinery::Loggable
+    include Refinery::Configurable
     
     # Get a server-wide logger
     def self.logger
@@ -26,7 +26,7 @@ module RJob #:nodoc:
     
     # Stop the server
     def stop
-      logger.info "Stopping RJob Server"
+      logger.info "Stopping Refinery Server"
       daemons.each { |daemon| daemon.stop }
     end
     
@@ -37,7 +37,7 @@ module RJob #:nodoc:
     
     # Run the server
     def run
-      logger.info "Starting RJob server"
+      logger.info "Starting Refinery server"
       execute_daemons
       logger.info "Server is exiting"
     end
@@ -45,7 +45,7 @@ module RJob #:nodoc:
     private
     def execute_daemons
       1.upto(config.initial_number_of_daemons) do |daemon_number|
-        daemons << RJob::Daemon.start(self, daemon_number)
+        daemons << Refinery::Daemon.start(self, daemon_number)
       end
       logger.info "Running #{daemons.length} daemons"
       

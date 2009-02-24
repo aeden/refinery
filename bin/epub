@@ -19,7 +19,7 @@
 
 require 'getoptlong'
 require 'rdoc/usage'
-require File.dirname(__FILE__) + '/../lib/rjob'
+require File.dirname(__FILE__) + '/../lib/refinery'
 
 options = {}
 opts = GetoptLong.new(
@@ -38,4 +38,4 @@ opts.each do |opt, arg|
   end
 end
 
-RJob::EventPublisher.new(options).run
+Refinery::EventPublisher.new(options).run
