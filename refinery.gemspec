@@ -17,7 +17,7 @@ spec = Gem::Specification.new do |s|
   ].flatten
   s.require_path = 'lib'
   s.bindir = 'bin'
-  s.executables = ['refinery','epub']
+  s.executables = ['refinery','epub','pubnow']
   s.has_rdoc = true
   s.extra_rdoc_files = Dir['[A-Z]*']
   s.rdoc_options << '--title' <<  'Refinery - Distributed Processing'
