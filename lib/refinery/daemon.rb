@@ -37,11 +37,12 @@ module Refinery
       @thread = Thread.new(self) do |daemon|
         logger.info "Running thread"
         while(running?)
-          while(message = daemon.queue.receive())
+          daemon.queue.receive_messages(1, 10).each do |message|
             worker = load_worker_class(key).new
-            worker.run(JSON.parse(Base64.decode64(message.body)))
+            result = worker.run(JSON.parse(Base64.decode64(message.body)))
+            message.delete() if result
           end
-          sleep(10)
+          sleep(1)
         end
         logger.info "Exiting thread"
       end
