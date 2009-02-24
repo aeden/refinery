@@ -4,9 +4,6 @@ module Refinery #:nodoc:
     # Get a shared configuration
     def self.default
       @default ||= new({
-        'server' => {
-          'initial_number_of_daemons' => 3
-        },
         'aws' => {
           'credentials' => {}
         },
