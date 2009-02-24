@@ -7,7 +7,7 @@ aws:
 processors:
   sample:
     queue: 'sample' # can be omitted
-    publisher:
-      delay: 5
+    publishers:
+      delay: 30
     workers:
       initial: 3

@@ -41,7 +41,7 @@ module Refinery #:nodoc:
       @server = server
       @queue = queue
       @thread = Thread.new(self) do |daemon|
-        logger.info "Running thread"
+        logger.info "Running daemon thread"
         while(running?)
           daemon.queue.receive_messages(1, 10).each do |message|
             worker = load_worker_class(key).new
@@ -50,7 +50,7 @@ module Refinery #:nodoc:
           end
           sleep(1)
         end
-        logger.info "Exiting thread"
+        logger.info "Exiting daemon thread"
       end
     end
     

@@ -4,7 +4,7 @@ aws:
     secret_access_key: "bbb"
 processors:
   sample:
-    publisher:
+    publishers:
       delay: 10
     workers:
       initial: 3

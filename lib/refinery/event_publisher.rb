@@ -73,7 +73,7 @@ module Refinery #:nodoc:
         while(running?)
           load_publisher_class(key).new(queue).execute
           
-          delay = settings['publisher']['delay'] || 10
+          delay = settings['publishers']['delay'] || 10
           logger.info "Sleeping #{delay} seconds"
           sleep delay
           
