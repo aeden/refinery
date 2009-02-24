@@ -7,6 +7,8 @@ module Refinery #:nodoc:
     include Refinery::Queueable
     include Refinery::Utilities
     
+    attr_accessor :workers_directory
+    
     # Get a server-wide logger
     def self.logger
       @logger ||= begin
@@ -24,6 +26,12 @@ module Refinery #:nodoc:
     def initialize(options={})
       logger.level = Logger::DEBUG if options[:debug]
       config.load_file(options[:config]) if options[:config]
+      workers_directory = options[:workers] if options[:workers]
+    end
+    
+    # The directory where workers are found. Defaults to ./workers
+    def workers_directory
+      @workers_directory ||= "./workers"
     end
     
     # Stop the server

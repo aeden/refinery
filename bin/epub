@@ -16,6 +16,9 @@
 #
 # -c, --config filename
 #    specify a configuration file
+#
+# -w, --workers directory
+#    specify the directory for finding workers
 
 require 'getoptlong'
 require 'rdoc/usage'
@@ -35,6 +38,8 @@ opts.each do |opt, arg|
     options[:debug] = true
   when '--config'
     options[:config] = arg
+  when '--workers'
+    options[:workers] = arg
   end
 end
 

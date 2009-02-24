@@ -61,7 +61,7 @@ module Refinery #:nodoc:
     
     private
     def load_worker_class(key)
-      source_file = File.dirname(__FILE__) + "/../../workers/#{key}.rb"
+      source_file = "#{@server.workers_directory}/#{key}.rb"
       if File.exist?(source_file)
         modified_at = File.mtime(source_file)
         if workers[key] != modified_at

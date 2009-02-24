@@ -6,9 +6,10 @@ module Refinery #:nodoc:
     include Refinery::Queueable
     include Refinery::Utilities
     
-    
     RUNNING = 'running' #:nodoc:
     STOPPED = 'stopped' #:nodoc:
+    
+    attr_accessor :publishers_directory
     
     # Initialize the event publisher
     #
@@ -18,6 +19,7 @@ module Refinery #:nodoc:
     def initialize(options={})
       logger.level = Logger::DEBUG if options[:debug]
       config.load_file(options[:config]) if options[:config]
+      publishers_directory = options[:publishers] if options[:publishers]
     end
     
     # Get the event publisher state
@@ -28,6 +30,11 @@ module Refinery #:nodoc:
     # Return true if the event publisher is running
     def running?
       state == RUNNING
+    end
+    
+    # The directory where publishers are found. Defaults to ./publishers
+    def publishers_directory
+      @publishers_directory ||= './publishers'
     end
     
     # A hash of all publisher classes mapped to last modified timestamps.
@@ -75,7 +82,7 @@ module Refinery #:nodoc:
     end
     
     def load_publisher_class(key)
-      source_file = File.dirname(__FILE__) + "/../../publishers/#{key}.rb"
+      source_file = "#{publishers_directory}/#{key}.rb"
       if File.exist?(source_file)
         modified_at = File.mtime(source_file)
         if publishers[key] != modified_at

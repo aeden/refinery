@@ -1,0 +1,8 @@
+= Refinery
+
+Refinery is a distributed processing environment. It is designed to work with Amazon's SQS.
+
+== Requirements
+
+* RightScale AWS
+* JSON
