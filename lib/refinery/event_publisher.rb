@@ -6,10 +6,9 @@ module Refinery #:nodoc:
     include Refinery::Queueable
     include Refinery::Utilities
     
-    #:nodoc:
-    RUNNING = 'running'
-    #:nodoc:
-    STOPPED = 'stopped'
+    
+    RUNNING = 'running' #:nodoc:
+    STOPPED = 'stopped' #:nodoc:
     
     # Initialize the event publisher
     #
