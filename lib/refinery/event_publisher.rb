@@ -1,9 +1,12 @@
-module Refinery
+module Refinery #:nodoc:
+  # Publish events.
   class EventPublisher
     include Refinery::Loggable
     include Refinery::Configurable
     
+    #:nodoc:
     RUNNING = 'running'
+    #:nodoc:
     STOPPED = 'stopped'
     
     # Initialize the event publisher
@@ -16,18 +19,22 @@ module Refinery
       config.load_file(options[:config]) if options[:config]
     end
     
+    # Get the event publisher state
     def state
       @state ||= RUNNING
     end
     
+    # Return true if the event publisher is running
     def running?
       state == RUNNING
     end
     
+    # A hash of all publishers instantiated.
     def publishers
       @publishers ||= {}
     end
     
+    # Run the event publisher
     def run
       logger.info "Starting event publisher"
       config['processors'].each do |key, settings|
@@ -43,10 +50,12 @@ module Refinery
     end
     
     private
+    # An array of threads, one for each publisher instance
     def threads
       @threads ||= []
     end
     
+    # Run the publisher for the given key
     def run_publisher(key, settings)
       logger.info "Creating publisher for #{key}"
       queue = sqs.queue(key)
@@ -71,6 +80,7 @@ module Refinery
       end
     end
     
+    # Get an SQS connection
     def sqs
       @sqs ||= RightAws::SqsGen2.new(
         config['aws']['credentials']["access_key_id"], 
@@ -78,6 +88,7 @@ module Refinery
       )
     end
     
+    # Camelize the given word.
     def camelize(word, first_letter_in_uppercase = true)
       if first_letter_in_uppercase
         word.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
