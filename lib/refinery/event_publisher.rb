@@ -30,7 +30,7 @@ module Refinery
     
     def run
       logger.info "Starting event publisher"
-      config.publishing.each do |key, settings|
+      config['processors'].each do |key, settings|
         run_publisher(key, settings)
       end
       
@@ -73,8 +73,8 @@ module Refinery
     
     def sqs
       @sqs ||= RightAws::SqsGen2.new(
-        config.aws.credentials["access_key_id"], 
-        config.aws.credentials["secret_access_key"]
+        config['aws']['credentials']["access_key_id"], 
+        config['aws']['credentials']["secret_access_key"]
       )
     end
     

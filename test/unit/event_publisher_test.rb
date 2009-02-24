@@ -5,9 +5,7 @@ class EventPublisherTest < Test::Unit::TestCase
       publishing_settings = {'sample' => {'delay' => 10}}
       Refinery::Config.any_instance.stubs(:publishing).returns(publishing_settings)
       event_publisher = Refinery::EventPublisher.new
-      assert_raise Refinery::ConfigurationError do
-        event_publisher.run
-      end
+      event_publisher.run
     end
   end
 end

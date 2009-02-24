@@ -44,7 +44,7 @@ module Refinery #:nodoc:
     
     private
     def execute_daemons
-      1.upto(config.initial_number_of_daemons) do |daemon_number|
+      1.upto(config[:server][:initial_number_of_daemons]) do |daemon_number|
         daemons << Refinery::Daemon.start(self, daemon_number)
       end
       logger.info "Running #{daemons.length} daemons"
