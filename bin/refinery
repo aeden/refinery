@@ -16,6 +16,9 @@
 #
 # -c, --config filename
 #    specify a configuration file
+#
+# -w, --workers directory
+#    specify the directory for finding workers
 
 require 'getoptlong'
 require 'rdoc/usage'
@@ -25,7 +28,8 @@ options = {}
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
-  [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT]
+  [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT],
+  [ '--workers', '-w', GetoptLong::REQUIRED_ARGUMENT]
 )
 opts.each do |opt, arg|
   case opt
@@ -35,6 +39,8 @@ opts.each do |opt, arg|
     options[:debug] = true
   when '--config'
     options[:config] = arg
+  when '--workers'
+    options[:workers] = arg
   end
 end
 

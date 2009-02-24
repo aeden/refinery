@@ -6,6 +6,7 @@ module Refinery #:nodoc:
     include Refinery::Queueable
     include Refinery::Utilities
     
+    STARTING = 'starting' #:nodoc:
     RUNNING = 'running' #:nodoc:
     STOPPED = 'stopped' #:nodoc:
     
@@ -24,7 +25,7 @@ module Refinery #:nodoc:
     
     # Get the event publisher state
     def state
-      @state ||= RUNNING
+      @state ||= STARTING
     end
     
     # Return true if the event publisher is running
@@ -42,12 +43,23 @@ module Refinery #:nodoc:
       @publishers ||= {}
     end
     
+    # Run the specified publisher once and return
+    def run_once(key)
+      settings = config['processors'][key]
+      queue_name = settings['queue'] || key
+      logger.debug "Using queue #{queue_name}"
+      queue = sqs.queue(queue_name)
+      load_publisher_class(key).new(queue).execute
+    end
+    
     # Run the event publisher
     def run
       logger.info "Starting event publisher"
       config['processors'].each do |key, settings|
         run_publisher(key, settings)
       end
+      
+      state = RUNNING
       
       begin
         threads.each { |thread| thread.join }

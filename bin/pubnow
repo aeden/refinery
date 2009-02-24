@@ -6,7 +6,7 @@
 #
 # == Usage
 #
-# epub [OPTION]
+# pubnow [OPTION] KEY
 #
 # -h, --help:
 #    show help
@@ -17,8 +17,8 @@
 # -c, --config filename
 #    specify a configuration file
 #
-# -p, --publishers directory
-#    specify the directory for finding workers
+# KEY: the name of the publisher to run. For example
+# to run the sample publisher use 'sample'
 
 require 'getoptlong'
 require 'rdoc/usage'
@@ -28,8 +28,7 @@ options = {}
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
-  [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT],
-  [ '--publishers', '-p', GetoptLong::REQUIRED_ARGUMENT]
+  [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT]
 )
 opts.each do |opt, arg|
   case opt
@@ -39,9 +38,12 @@ opts.each do |opt, arg|
     options[:debug] = true
   when '--config'
     options[:config] = arg
-  when '--publishers'
-    options[:publishers] = arg
   end
 end
 
-Refinery::EventPublisher.new(options).run
+if ARGV.length != 1
+  puts "Missing key argument (try --help)"
+  exit 0
+end
+
+Refinery::EventPublisher.new(options).run_once(ARGV.shift)
