@@ -1,5 +1,3 @@
-server:
-  initial_number_of_daemons: 3
 aws:
   credentials:
     access_key_id: "access_key_id"
