@@ -1,7 +1,7 @@
 # A sample publisher that posts a message to the queue.
 class Sample < Refinery::Publisher
   def execute
-    if queue.size == 0
+    if waiting_queue.size == 0
       publish(['execute', {'text' => 'hey there!'}])
     end
   end

@@ -9,7 +9,9 @@ module Refinery #:nodoc:
     STOPPED = 'stopped'
     
     attr_reader :thread
-    attr_reader :queue
+    attr_reader :waiting_queue
+    attr_reader :done_queue
+    attr_reader :error_queue
     
     # Stop the daemon
     def stop
@@ -21,6 +23,7 @@ module Refinery #:nodoc:
       @state ||= RUNNING
     end
     
+    # Set the daemon state.
     def state=(state)
       @state = state
     end
@@ -35,18 +38,32 @@ module Refinery #:nodoc:
     #
     # * <tt>server</tt>: The server instance
     # * <tt>key</tt>: The processor key (i.e. its name)
-    # * <tt>queue</tt>: The queue to read from
-    def initialize(server, key, queue)
+    # * <tt>waiting_queue</tt>: The waiting queue that provides messages to be processed
+    # * <tt>error_queue</tt>: The queue where errors are posted.
+    # * <tt>done_queue</tt>: The queue for messages that have been processed.
+    def initialize(server, key, waiting_queue, error_queue, done_queue)
       Refinery::Server.logger.info "Starting daemon"
+      
       @server = server
-      @queue = queue
+      @waiting_queue = waiting_queue
+      @error_queue = error_queue
+      @done_queue = done_queue
+      
       @thread = Thread.new(self) do |daemon|
         logger.info "Running daemon thread"
         while(running?)
-          daemon.queue.receive_messages(1, 10).each do |message|
+          daemon.waiting_queue.receive_messages(1, 10).each do |message|
             worker = load_worker_class(key).new
-            result = worker.run(JSON.parse(Base64.decode64(message.body)))
-            message.delete() if result
+            begin
+              message.delete() if worker.run(JSON.parse(Base64.decode64(message.body)))
+            rescue Exception => e
+              error_message = {
+                'error' => {'message' => e.message, 'class' => e.class.name}, 
+                'original' => message
+              }
+              error_queue.send_message(Base64.encode64(error_message.to_json))
+              message.delete()
+            end
           end
           sleep(1)
         end

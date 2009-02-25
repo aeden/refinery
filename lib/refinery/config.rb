@@ -28,7 +28,16 @@ module Refinery #:nodoc:
     
     # Load configuration from a YAML file
     def load_file(file)
-      @data = YAML::load_file(file)
+      @file = file
+      @data = YAML::load_file(@file)
+      @last_load = File.mtime(@file)
+    end
+    
+    # Refresh the configuration from the YAML file if necessary.
+    def refresh
+      if File.mtime(@file) != @last_load
+        @data = YAML::load_file(@file)
+      end
     end
     
     private

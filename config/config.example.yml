@@ -9,3 +9,8 @@ processors:
       delay: 30
     workers:
       initial: 3
+  error:
+    publishers:
+      delay: 30
+    workers:
+      initial: 1

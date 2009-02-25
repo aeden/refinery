@@ -46,20 +46,20 @@ module Refinery #:nodoc:
     # Run the specified publisher once and return
     def run_once(key)
       settings = config['processors'][key]
+      raise RuntimeError, "No processor configuration found for #{key}" unless settings
       queue_name = settings['queue'] || key
-      logger.debug "Using queue #{queue_name}"
-      queue = sqs.queue(queue_name)
-      load_publisher_class(key).new(queue).execute
+      logger.debug "Using queue #{queue_name}_waiting"
+      waiting_queue = sqs.queue("#{queue_name}_waiting")
+      load_publisher_class(key).new(waiting_queue).execute
     end
     
     # Run the event publisher
     def run
+      @state = RUNNING
       logger.info "Starting event publisher"
       config['processors'].each do |key, settings|
         run_publisher(key, settings)
       end
-      
-      state = RUNNING
       
       begin
         threads.each { |thread| thread.join }
@@ -79,11 +79,12 @@ module Refinery #:nodoc:
     def run_publisher(key, settings)
       logger.info "Creating publisher for #{key}"
       queue_name = settings['queue'] || key
-      logger.debug "Using queue #{queue_name}"
-      queue = sqs.queue(queue_name)
-      threads << Thread.new(queue, settings) do |queue, settings|
+      logger.debug "Using queue #{queue_name}_waiting"
+      waiting_queue = sqs.queue("#{queue_name}_waiting")
+      
+      threads << Thread.new(waiting_queue, settings) do |waiting_queue, settings|
         while(running?)
-          load_publisher_class(key).new(queue).execute
+          load_publisher_class(key).new(waiting_queue).execute
           
           delay = settings['publishers']['delay'] || 60
           logger.info "Sleeping #{delay} seconds"
