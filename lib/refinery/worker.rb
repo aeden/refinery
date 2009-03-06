@@ -22,7 +22,8 @@ module Refinery #:nodoc:
       (@data_store ||= {})[options] ||= Moneta::S3.new(
         :access_key_id => config['aws']['credentials']['access_key_id'],  
         :secret_access_key => config['aws']['credentials']['secret_access_key'],
-        :bucket => options[:bucket]
+        :bucket => options[:bucket],
+        :multi_thread => true
       )
     end
   end

@@ -20,7 +20,7 @@ module Refinery #:nodoc:
     def initialize(options={})
       logger.level = Logger::DEBUG if options[:debug]
       config.load_file(options[:config]) if options[:config]
-      publishers_directory = options[:publishers] if options[:publishers]
+      self.publishers_directory = options[:publishers] if options[:publishers]
     end
     
     # Get the event publisher state

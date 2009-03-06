@@ -28,7 +28,8 @@ options = {}
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
-  [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT]
+  [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT],
+  [ '--publishers', '-p', GetoptLong::REQUIRED_ARGUMENT]
 )
 opts.each do |opt, arg|
   case opt
@@ -38,6 +39,8 @@ opts.each do |opt, arg|
     options[:debug] = true
   when '--config'
     options[:config] = arg
+  when '--publishers'
+    options[:publishers] = arg
   end
 end
 
