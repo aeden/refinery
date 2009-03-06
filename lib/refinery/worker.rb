@@ -3,6 +3,11 @@ module Refinery #:nodoc:
   # directory.
   class Worker 
     include Refinery::Loggable
+    include Refinery::Configurable
+    
+    def initialize(daemon)
+      @daemon = daemon
+    end
     
     # Run the worker with the given message
     def run(message)
@@ -11,6 +16,14 @@ module Refinery #:nodoc:
         execute(message)
       end
       logger.debug "Completed worker #{self.class.name} in #{time} seconds"
+    end
+    
+    def data_store(options)
+      (@data_store ||= {})[options] ||= Moneta::S3.new(
+        :access_key_id => config['aws']['credentials']['access_key_id'],  
+        :secret_access_key => config['aws']['credentials']['secret_access_key'],
+        :bucket => options[:bucket]
+      )
     end
   end
 end

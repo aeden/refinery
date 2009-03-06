@@ -19,6 +19,8 @@ module Refinery
     require_library('rubygems', 'Rubygems')
     require_library('right_aws', 'RightScale AWS gem')
     require_library('json', 'JSON gem')
+    require_library('moneta', 'Moneta gem')
+    require_library('moneta/s3', 'Moneta S3 implementation')
   end
   
   def self.require_internals

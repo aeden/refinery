@@ -53,7 +53,7 @@ module Refinery #:nodoc:
         logger.info "Running daemon thread"
         while(running?)
           daemon.waiting_queue.receive_messages(1, 10).each do |message|
-            worker = load_worker_class(key).new
+            worker = load_worker_class(key).new(self)
             begin
               message.delete() if worker.run(JSON.parse(Base64.decode64(message.body)))
             rescue Exception => e

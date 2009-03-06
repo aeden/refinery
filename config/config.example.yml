@@ -8,7 +8,7 @@ processors:
     publishers:
       delay: 30
     workers:
-      initial: 3
+      initial: 3    
   error:
     publishers:
       delay: 30
