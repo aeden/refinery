@@ -49,7 +49,7 @@ module Refinery #:nodoc:
       raise RuntimeError, "No processor configuration found for #{key}" unless settings
       queue_name = settings['queue'] || key
       logger.debug "Using queue #{queue_name}_waiting"
-      waiting_queue = sqs.queue("#{queue_name}_waiting")
+      waiting_queue = queue("#{queue_name}_waiting")
       load_publisher_class(key).new(waiting_queue).execute
     end
     
@@ -80,7 +80,7 @@ module Refinery #:nodoc:
       logger.info "Creating publisher for #{key}"
       queue_name = settings['queue'] || key
       logger.debug "Using queue #{queue_name}_waiting"
-      waiting_queue = sqs.queue("#{queue_name}_waiting")
+      waiting_queue = queue("#{queue_name}_waiting")
       
       threads << Thread.new(waiting_queue, settings) do |waiting_queue, settings|
         while(running?)

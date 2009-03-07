@@ -1,8 +1,13 @@
 module Refinery
   module Queueable
-    # Get a queue connection
-    def queue
-      @queue ||= RightAws::SqsGen2.new(
+    # Get a named queue
+    def queue(name)
+      queue_provider.queue(name)
+    end
+    
+    protected
+    def queue_provider
+      @queue_provider ||= RightAws::SqsGen2.new(
         config['aws']['credentials']["access_key_id"], 
         config['aws']['credentials']["secret_access_key"],
         {:multi_thread => true}

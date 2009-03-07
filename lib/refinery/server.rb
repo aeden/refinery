@@ -59,9 +59,9 @@ module Refinery #:nodoc:
         
         queue_name = settings['queue'] || key
         logger.debug "Using queue #{queue_name}"
-        waiting_queue = sqs.queue("#{queue_name}_waiting")
-        error_queue = sqs.queue("#{queue_name}_error")
-        done_queue = sqs.queue("#{queue_name}_done")
+        waiting_queue = queue("#{queue_name}_waiting")
+        error_queue = queue("#{queue_name}_error")
+        done_queue = queue("#{queue_name}_done")
         
         1.upto(settings['workers']['initial']) do
           daemons << Refinery::Daemon.new(self, key, waiting_queue, error_queue, done_queue)

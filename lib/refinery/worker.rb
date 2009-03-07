@@ -6,6 +6,7 @@ module Refinery #:nodoc:
     include Refinery::Configurable
     include Refinery::Utilities
     
+    # Initialize the worker with the given daemon.
     def initialize(daemon)
       @daemon = daemon
     end
@@ -19,6 +20,13 @@ module Refinery #:nodoc:
       logger.debug "Completed worker #{self.class.name} in #{time} seconds"
     end
     
+    # Get the data store for the worker.
+    #
+    # The data store is provided through the Moneta interface.
+    #
+    # If the configuration providers a data_store:class option then that class
+    # will be used (the class must be in the Moneta module), otherwise 
+    # Moneta::S3 will be used.
     def data_store(options)
       class_name = processor_config['workers']['data_store']['class'] rescue 'S3'
       ds_class = Moneta.const_get(camelize(class_name))

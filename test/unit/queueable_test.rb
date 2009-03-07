@@ -11,12 +11,14 @@ class QueueableTest < Test::Unit::TestCase
       setup_default_config
       
       queue = stub('queue')
+      queue_provider = stub('queue provider')
+      queue_provider.stubs(:queue).returns(queue)
       RightAws::SqsGen2.stubs(:new).with(
         'aki', 'sak', {:multi_thread => true}
-      ).returns(queue)
+      ).returns(queue_provider)
       
       queueable = QueueMe.new
-      assert_not_nil queueable.queue
+      assert_not_nil queueable.queue('a_queue')
     end
   end
 end
