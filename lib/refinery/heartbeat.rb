@@ -3,6 +3,8 @@ module Refinery #:nodoc:
   class Heartbeat
     include Refinery::Loggable
     include Refinery::Configurable
+    
+    # Initialize the heartbeat for the given server.
     def initialize(server)
       @server = server
       @thread = Thread.new do

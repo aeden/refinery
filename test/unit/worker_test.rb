@@ -20,16 +20,7 @@ class WorkerTest < Test::Unit::TestCase
     end
     should_eventually "provide a data store" do
       options = {:bucket => 'bucket'}
-      Refinery::Config.stubs(:default).returns(Refinery::Config.new(
-        {
-          'aws' => {
-            'credentials' => {
-              'access_key_id' => 'aki',
-              'secret_access_key' => 'sak'
-            }
-          }
-        }
-      ))
+      setup_default_config
       assert_not_nil @worker.data_store(options)
     end
   end

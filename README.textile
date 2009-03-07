@@ -1,8 +1,16 @@
 h1. Refinery
 
-Refinery is a distributed processing environment. It is designed to work with Amazon's SQS.
+Refinery is a distributed processing framework written in the Ruby
+programming language. It is designed to work with Amazon's Web
+Services such as SQS and S3 to distribute image and data processing
+across multiple severs to alleviate the need for heavy-duty data and
+image processing on web application servers.
+
+Interprocess messaging is accomplished through a distributed queue system such as Amazon SQS and data storage is accomplished through a distributed data store
+such as Amazon's S3.
 
 h2. Requirements
 
 * RightScale AWS
 * JSON
+* Moneta

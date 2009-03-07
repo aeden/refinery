@@ -6,6 +6,10 @@ require 'benchmark'
 # The Refinery module contains all of the classes for the refinery system.
 module Refinery
   
+  # Require the specified library.
+  #
+  # The short name is the require path and the display_name will be shown
+  # if the library cannot be loaded.
   def self.require_library(short_name, display_name)
     begin
       require short_name
@@ -15,6 +19,7 @@ module Refinery
     end
   end
   
+  # Require all of the dependencies.
   def self.require_libraries
     require_library('rubygems', 'Rubygems')
     require_library('right_aws', 'RightScale AWS gem')
@@ -23,6 +28,7 @@ module Refinery
     require_library('moneta/s3', 'Moneta S3 implementation')
   end
   
+  # Require internal code files
   def self.require_internals
     require 'refinery/loggable'
     require 'refinery/configurable'
@@ -37,6 +43,7 @@ module Refinery
     require 'refinery/worker'
     require 'refinery/event_publisher'
     require 'refinery/publisher'
+    require 'refinery/monitor'
   end
   
   # Raised if a source file cannot be loaded

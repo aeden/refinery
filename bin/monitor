@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+# == Synopsis
+#
+# monitor: monitor the refinery system
+#
+# == Usage
+#
+# monitor [OPTION]
+#
+# -h, --help:
+#    show help
+#
+# -d, --debug:
+#    turn on debug logging
+#
+# -c, --config filename
+#    specify a configuration file
+
+require 'getoptlong'
+require 'rdoc/usage'
+require File.dirname(__FILE__) + '/../lib/refinery'
+
+options = {}
+opts = GetoptLong.new(
+  [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
+  [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT]
+)
+opts.each do |opt, arg|
+  case opt
+  when '--help'
+    RDoc::usage
+  when '--debug'
+    options[:debug] = true
+  when '--config'
+    options[:config] = arg
+  end
+end
+
+Refinery::Monitor.new(options).run
