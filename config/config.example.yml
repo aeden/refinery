@@ -8,7 +8,9 @@ processors:
     publishers:
       delay: 30
     workers:
-      initial: 3    
+      initial: 3
+      data_store:
+        class: s3
   error:
     publishers:
       delay: 30

@@ -18,8 +18,18 @@ class WorkerTest < Test::Unit::TestCase
       @worker.run(@message)
       assert_equal @message, @worker.message
     end
-    should_eventually "provide a data store" do
+    should "provide a data store" do
       options = {:bucket => 'bucket'}
+      
+      data_store = stub('data store')
+      
+      Moneta::S3.expects(:new).with(
+        :access_key_id => 'aki',  
+        :secret_access_key => 'sak',
+        :bucket => options[:bucket],
+        :multi_thread => true
+      ).returns(data_store)
+      
       setup_default_config
       assert_not_nil @worker.data_store(options)
     end

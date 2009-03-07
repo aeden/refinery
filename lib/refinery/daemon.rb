@@ -9,6 +9,7 @@ module Refinery #:nodoc:
     STOPPED = 'stopped'
     
     attr_reader :thread
+    attr_reader :name
     attr_reader :waiting_queue
     attr_reader :done_queue
     attr_reader :error_queue
@@ -37,14 +38,15 @@ module Refinery #:nodoc:
     # Initialize the daemon.
     #
     # * <tt>server</tt>: The server instance
-    # * <tt>key</tt>: The processor key (i.e. its name)
+    # * <tt>name</tt>: The processor name
     # * <tt>waiting_queue</tt>: The waiting queue that provides messages to be processed
     # * <tt>error_queue</tt>: The queue where errors are posted.
     # * <tt>done_queue</tt>: The queue for messages that have been processed.
-    def initialize(server, key, waiting_queue, error_queue, done_queue)
+    def initialize(server, name, waiting_queue, error_queue, done_queue)
       Refinery::Server.logger.info "Starting daemon"
       
       @server = server
+      @name = name
       @waiting_queue = waiting_queue
       @error_queue = error_queue
       @done_queue = done_queue
@@ -53,7 +55,7 @@ module Refinery #:nodoc:
         logger.info "Running daemon thread"
         while(running?)
           daemon.waiting_queue.receive_messages(1, 10).each do |message|
-            worker = load_worker_class(key).new(self)
+            worker = load_worker_class(name).new(self)
             begin
               message.delete() if worker.run(JSON.parse(Base64.decode64(message.body)))
             rescue Exception => e
@@ -77,20 +79,21 @@ module Refinery #:nodoc:
     end
     
     private
-    def load_worker_class(key)
-      source_file = "#{@server.workers_directory}/#{key}.rb"
+    # Load the appropriate worker class
+    def load_worker_class(name)
+      source_file = "#{@server.workers_directory}/#{name}.rb"
       if File.exist?(source_file)
         modified_at = File.mtime(source_file)
-        if workers[key] != modified_at
+        if workers[name] != modified_at
           logger.debug "Loading #{source_file}"
           load(source_file)
-          workers[key] = modified_at
+          workers[name] = modified_at
         end
       else
         raise SourceFileNotFound, "Source file not found: #{source_file}"
       end
       
-      Object.const_get(camelize(key))
+      Object.const_get(camelize(name))
     end
   end
 end
