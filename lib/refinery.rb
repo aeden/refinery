@@ -27,6 +27,7 @@ module Refinery
     require_library('json', 'JSON gem')
     require_library('moneta', 'Moneta gem')
     require_library('moneta/s3', 'Moneta S3 implementation')
+    require_library('sequel', 'Sequel gem')
   end
   
   # Require internal code files

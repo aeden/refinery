@@ -44,7 +44,7 @@ module Refinery #:nodoc:
             logger.debug decode_message(message.body).inspect
             message.delete()
           end
-          sleep(5)
+          sleep(2)
         end
       end
     end
@@ -55,18 +55,27 @@ module Refinery #:nodoc:
         done_queue_name = "#{queue_name}_done"
         logger.debug "Starting monitor for queue #{done_queue_name}"
         Thread.new(queue(done_queue_name)) do |done_queue|
-          loop do
-            while (message = done_queue.receive)
-              done_message = decode_message(message.body)
-              logger.debug "Done: #{done_message.inspect}"
-              logger.debug "Original message: #{decode_message(done_message['original']).inspect}"
+          begin
+            loop do
+              while (message = done_queue.receive)
+                done_message = decode_message(message.body)
+                logger.debug "Done: #{done_message.inspect}"
+                logger.debug "Original message: #{decode_message(done_message['original']).inspect}"
               
-              statistics.complete_run(done_message['run_time'])
-              puts "runs: #{statistics.total_runs}, sum: #{statistics.total_runtime}, avg: #{statistics.average_runtime}"
+                db[:completed_jobs] << {
+                  :host => done_message['host_info']['hostname'],
+                  :run_time => done_message['run_time']
+                }
               
-              message.delete()
+                statistics.complete_run(done_message['run_time'])
+                puts "runs: #{statistics.total_runs}, sum: #{statistics.total_runtime}, avg: #{statistics.average_runtime}"
+              
+                message.delete()
+              end
+              sleep(2)
             end
-            sleep(5)
+          rescue Exception => e
+            puts "Error: #{e.message}"
           end
         end
       end
@@ -85,9 +94,23 @@ module Refinery #:nodoc:
               logger.debug "Original message: #{decode_message(error_message['original']).inspect}"
               message.delete()
             end
-            sleep(5)
+            sleep(2)
           end
         end
+      end
+    end
+    
+    def db
+      @db ||= begin
+        db = Sequel.connect('sqlite://stats.db')
+        unless db.table_exists?(:completed_jobs)
+          db.create_table :completed_jobs do
+            primary_key :id
+            column :host, :text
+            column :run_time, :float
+          end
+        end
+        db
       end
     end
     
