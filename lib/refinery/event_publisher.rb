@@ -18,6 +18,7 @@ module Refinery #:nodoc:
     # * <tt>:debug</tt>: Set to true to enable debug logging
     # * <tt>:config</tt>: Provide a file path to load that config
     def initialize(options={})
+      logger.level = Logger::INFO if options[:verbose]
       logger.level = Logger::DEBUG if options[:debug]
       config.load_file(options[:config]) if options[:config]
       self.publishers_directory = options[:publishers] if options[:publishers]

@@ -43,7 +43,7 @@ module Refinery #:nodoc:
     # * <tt>error_queue</tt>: The queue where errors are posted.
     # * <tt>done_queue</tt>: The queue for messages that have been processed.
     def initialize(server, name, waiting_queue, error_queue, done_queue)
-      Refinery::Server.logger.info "Starting daemon"
+      Refinery::Server.logger.debug "Starting daemon"
       
       @server = server
       @name = name
@@ -52,24 +52,40 @@ module Refinery #:nodoc:
       @done_queue = done_queue
       
       @thread = Thread.new(self) do |daemon|
-        logger.info "Running daemon thread"
+        logger.debug "Running daemon thread"
         while(running?)
           daemon.waiting_queue.receive_messages(1, 10).each do |message|
             worker = load_worker_class(name).new(self)
             begin
-              message.delete() if worker.run(JSON.parse(Base64.decode64(message.body)))
+              result, run_time = worker.run(decode_message(message.body))
+              if result
+                done_message = {
+                  'host_info' => host_info,
+                  'original' => message.body,
+                  'run_time' => run_time
+                }
+                logger.debug "Sending 'done' message to #{done_queue.name}"
+                done_queue.send_message(encode_message(done_message))
+                
+                logger.debug "Deleting message from queue"
+                message.delete()
+              end
             rescue Exception => e
               error_message = {
-                'error' => {'message' => e.message, 'class' => e.class.name}, 
-                'original' => message
+                'error' => {
+                  'message' => e.message, 
+                  'class' => e.class.name
+                }, 
+                'host_info' => host_info,
+                'original' => message.body
               }
-              error_queue.send_message(Base64.encode64(error_message.to_json))
+              error_queue.send_message(encode_message(error_message))
               message.delete()
             end
           end
           sleep(1)
         end
-        logger.info "Exiting daemon thread"
+        logger.debug "Exiting daemon thread"
       end
     end
     

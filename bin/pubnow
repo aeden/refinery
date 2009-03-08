@@ -17,6 +17,9 @@
 # -c, --config filename
 #    specify a configuration file
 #
+# -v, --verbose
+#    print info to the standard output
+#
 # KEY: the name of the publisher to run. For example
 # to run the sample publisher use 'sample'
 
@@ -29,7 +32,8 @@ opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
   [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT],
-  [ '--publishers', '-p', GetoptLong::REQUIRED_ARGUMENT]
+  [ '--publishers', '-p', GetoptLong::REQUIRED_ARGUMENT],
+  [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ]
 )
 opts.each do |opt, arg|
   case opt
@@ -41,6 +45,8 @@ opts.each do |opt, arg|
     options[:config] = arg
   when '--publishers'
     options[:publishers] = arg
+  when '--verbose'
+    options[:verbose] = true
   end
 end
 

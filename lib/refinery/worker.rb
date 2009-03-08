@@ -11,13 +11,15 @@ module Refinery #:nodoc:
       @daemon = daemon
     end
     
-    # Run the worker with the given message
+    # Run the worker with the given message. The worker should return true
     def run(message)
+      result = false
       logger.debug "Executing worker #{self.class.name}"
       time = Benchmark.realtime do
-        execute(message)
+        result = execute(message)
       end
       logger.debug "Completed worker #{self.class.name} in #{time} seconds"
+      return result, time
     end
     
     # Get the data store for the worker.

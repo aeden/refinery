@@ -2,7 +2,7 @@
 class Sample < Refinery::Publisher
   def execute
     if waiting_queue.size == 0
-      publish(['execute', {'text' => 'hey there!'}])
+      publish({'text' => 'hey there!'})
     end
   end
 end

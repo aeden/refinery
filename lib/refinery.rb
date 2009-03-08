@@ -1,6 +1,7 @@
 $:.unshift(File.dirname(__FILE__))
 
 require 'logger'
+require 'socket'
 require 'benchmark'
 
 # The Refinery module contains all of the classes for the refinery system.

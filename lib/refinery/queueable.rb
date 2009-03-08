@@ -6,6 +6,8 @@ module Refinery
     end
     
     protected
+    # Get the queue provider. Defaults to RightAws::SqsGen2 running
+    # in multi-thread mode.
     def queue_provider
       @queue_provider ||= RightAws::SqsGen2.new(
         config['aws']['credentials']["access_key_id"], 

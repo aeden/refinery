@@ -2,7 +2,7 @@
 class Error < Refinery::Publisher
   def execute
     if waiting_queue.size == 0
-      publish(['execute', {'text' => 'fire an error, please'}])
+      publish({'text' => 'fire an error, please'})
     end
   end
 end

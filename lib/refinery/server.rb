@@ -21,9 +21,12 @@ module Refinery #:nodoc:
     # Initialize the server.
     #
     # Options:
-    # * <tt>:debug</tt>: Set to true to enable debug logging
     # * <tt>:config</tt>: Provide a file path to load that config
+    # * <tt>:debug</tt>: Set to true to enable debug logging
+    # * <tt>:verbose</tt>: Set to true to enable info logging
+    # * <tt>:workers</tt>: The workers directory
     def initialize(options={})
+      logger.level = Logger::INFO if options[:verbose]
       logger.level = Logger::DEBUG if options[:debug]
       config.load_file(options[:config]) if options[:config]
       self.workers_directory = options[:workers] if options[:workers]
@@ -55,7 +58,7 @@ module Refinery #:nodoc:
     private
     def execute_daemons
       config['processors'].each do |key, settings|
-        logger.info "Creating daemons for #{key}"
+        logger.debug "Creating daemons for #{key}"
         
         queue_name = settings['queue'] || key
         logger.debug "Using queue #{queue_name}"
@@ -67,7 +70,7 @@ module Refinery #:nodoc:
           daemons << Refinery::Daemon.new(self, key, waiting_queue, error_queue, done_queue)
         end
         
-        logger.info "Running #{daemons.length} daemons"
+        logger.debug "Running #{daemons.length} daemons"
       end
       
       Heartbeat.new(self)

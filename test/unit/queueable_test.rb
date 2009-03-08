@@ -12,8 +12,8 @@ class QueueableTest < Test::Unit::TestCase
       
       queue = stub('queue')
       queue_provider = stub('queue provider')
-      queue_provider.stubs(:queue).returns(queue)
-      RightAws::SqsGen2.stubs(:new).with(
+      queue_provider.expects(:queue).with('a_queue').returns(queue)
+      RightAws::SqsGen2.expects(:new).with(
         'aki', 'sak', {:multi_thread => true}
       ).returns(queue_provider)
       

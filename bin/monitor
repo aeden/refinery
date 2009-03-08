@@ -16,6 +16,9 @@
 #
 # -c, --config filename
 #    specify a configuration file
+#
+# -v, --verbose
+#    print info to the standard output
 
 require 'getoptlong'
 require 'rdoc/usage'
@@ -25,7 +28,8 @@ options = {}
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
-  [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT]
+  [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT],
+  [ '--verbose', '-v', GetoptLong::NO_ARGUMENT]
 )
 opts.each do |opt, arg|
   case opt
@@ -35,6 +39,8 @@ opts.each do |opt, arg|
     options[:debug] = true
   when '--config'
     options[:config] = arg
+  when '--verbose'
+    options[:verbose] = true
   end
 end
 
