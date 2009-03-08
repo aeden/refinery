@@ -8,6 +8,7 @@ module Refinery #:nodoc:
     include Refinery::Utilities
     
     def initialize(options)
+      logger.level = Logger::INFO if options[:verbose]
       logger.level = Logger::DEBUG if options[:debug]
       config.load_file(options[:config]) if options[:config]
     end
@@ -40,9 +41,13 @@ module Refinery #:nodoc:
       logger.info "Starting heartbeat monitor"
       Thread.new(queue('heartbeat')) do |heartbeat_queue|
         loop do
-          while (message = heartbeat_queue.receive)
-            logger.debug decode_message(message.body).inspect
-            message.delete()
+          begin
+            while (message = heartbeat_queue.receive)
+              logger.debug decode_message(message.body).inspect
+              message.delete()
+            end
+          rescue Exception => e
+            logger.error e
           end
           sleep(2)
         end
@@ -55,27 +60,19 @@ module Refinery #:nodoc:
         done_queue_name = "#{queue_name}_done"
         logger.debug "Starting monitor for queue #{done_queue_name}"
         Thread.new(queue(done_queue_name)) do |done_queue|
-          begin
-            loop do
+          loop do
+            begin
               while (message = done_queue.receive)
                 done_message = decode_message(message.body)
                 processed = decode_message(done_message['original'])
-                logger.debug "Done: #{processed.inspect}"
-              
-                db[:completed_jobs] << {
-                  :host => done_message['host_info']['hostname'],
-                  :pid => done_message['host_info']['pid'],
-                  :run_time => done_message['run_time'],
-                  :original_message => done_message['original'],
-                  :when => Time.now
-                }
-                
+                logger.info "Done: #{processed.inspect}"
                 message.delete()
+                statistics.record_done(done_message)
               end
-              sleep(2)
+            rescue Exception => e
+              logger.error e
             end
-          rescue Exception => e
-            puts "Error: #{e.message}"
+            sleep(2)
           end
         end
       end
@@ -88,53 +85,20 @@ module Refinery #:nodoc:
         logger.info "Starting error monitor for queue #{error_queue_name}"
         Thread.new(queue(error_queue_name)) do |error_queue|
           loop do
-            while (message = error_queue.receive)
-              error_message = decode_message(message.body)
-              processed = decode_message(error_message['original'])
-              logger.debug "Error: #{processed.inspect}"
-              
-              db[:errors] << {
-                :host => error_message['host_info']['hostname'],
-                :pid => error_message['host_info']['pid'],
-                :error_class => error_message['error']['class'],
-                :error_message => error_message['error']['message'],
-                :original_message => error_message['original'],
-                :time => Time.now
-              }
-              
-              message.delete()
+            begin
+              while (message = error_queue.receive)
+                error_message = decode_message(message.body)
+                processed = decode_message(error_message['original'])
+                logger.info "Error: #{processed.inspect}"
+                message.delete()
+                statistics.record_error(error_message)
+              end
+            rescue Exception => e
+              logger.error e
             end
             sleep(2)
           end
         end
-      end
-    end
-    
-    def db
-      @db ||= begin
-        db = Sequel.connect('sqlite://stats.db')
-        unless db.table_exists?(:completed_jobs)
-          db.create_table :completed_jobs do
-            primary_key :id
-            column :host, :text
-            column :pid, :integer
-            column :run_time, :float
-            column :original_message, :text
-            column :when, :time
-          end
-        end
-        unless db.table_exists?(:errors)
-          db.create_table :errors do
-            primary_key :id
-            column :host, :text
-            column :pid, :integer
-            column :error_class, :text
-            column :error_message, :text
-            column :original_message, :text
-            column :when, :time
-          end
-        end
-        db
       end
     end
     

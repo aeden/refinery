@@ -85,10 +85,15 @@ module Refinery #:nodoc:
       
       threads << Thread.new(waiting_queue, settings) do |waiting_queue, settings|
         while(running?)
-          load_publisher_class(key).new(waiting_queue).execute
+          begin
+            load_publisher_class(key).new(waiting_queue).execute
+          rescue Exception => e
+            logger.error e
+            raise e
+          end
           
           delay = settings['publishers']['delay'] || 60
-          logger.info "Sleeping #{delay} seconds"
+          logger.debug "Sleeping #{delay} seconds"
           sleep delay
           
         end
