@@ -59,17 +59,17 @@ module Refinery #:nodoc:
             loop do
               while (message = done_queue.receive)
                 done_message = decode_message(message.body)
-                logger.debug "Done: #{done_message.inspect}"
-                logger.debug "Original message: #{decode_message(done_message['original']).inspect}"
+                processed = decode_message(done_message['original'])
+                logger.debug "Done: #{processed.inspect}"
               
                 db[:completed_jobs] << {
                   :host => done_message['host_info']['hostname'],
-                  :run_time => done_message['run_time']
+                  :pid => done_message['host_info']['pid'],
+                  :run_time => done_message['run_time'],
+                  :original_message => done_message['original'],
+                  :when => Time.now
                 }
-              
-                statistics.complete_run(done_message['run_time'])
-                puts "runs: #{statistics.total_runs}, sum: #{statistics.total_runtime}, avg: #{statistics.average_runtime}"
-              
+                
                 message.delete()
               end
               sleep(2)
@@ -90,8 +90,18 @@ module Refinery #:nodoc:
           loop do
             while (message = error_queue.receive)
               error_message = decode_message(message.body)
-              logger.debug "Error: #{error_message.inspect}"
-              logger.debug "Original message: #{decode_message(error_message['original']).inspect}"
+              processed = decode_message(error_message['original'])
+              logger.debug "Error: #{processed.inspect}"
+              
+              db[:errors] << {
+                :host => error_message['host_info']['hostname'],
+                :pid => error_message['host_info']['pid'],
+                :error_class => error_message['error']['class'],
+                :error_message => error_message['error']['message'],
+                :original_message => error_message['original'],
+                :time => Time.now
+              }
+              
               message.delete()
             end
             sleep(2)
@@ -107,7 +117,21 @@ module Refinery #:nodoc:
           db.create_table :completed_jobs do
             primary_key :id
             column :host, :text
+            column :pid, :integer
             column :run_time, :float
+            column :original_message, :text
+            column :when, :time
+          end
+        end
+        unless db.table_exists?(:errors)
+          db.create_table :errors do
+            primary_key :id
+            column :host, :text
+            column :pid, :integer
+            column :error_class, :text
+            column :error_message, :text
+            column :original_message, :text
+            column :when, :time
           end
         end
         db
