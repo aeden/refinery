@@ -13,6 +13,9 @@ module Refinery #:nodoc:
       config.load_file(options[:config]) if options[:config]
     end
     
+    # Execute the monitor. The monitor will start one heartbeat 
+    # monitor thread and one thread for each done queue and error
+    # queue as specified in the configuration.
     def run
       logger.info "Starting up monitor"
       heartbeat_monitor_thread = run_heartbeat_monitor
@@ -32,7 +35,6 @@ module Refinery #:nodoc:
     end
     
     private
-    
     def statistics
       @statistics ||= Refinery::Statistics.new
     end
