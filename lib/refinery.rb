@@ -45,6 +45,7 @@ module Refinery
     require 'refinery/event_publisher'
     require 'refinery/publisher'
     require 'refinery/monitor'
+    require 'refinery/statistics'
   end
   
   # Raised if a source file cannot be loaded

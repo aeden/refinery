@@ -20,13 +20,21 @@ module Refinery #:nodoc:
       
       logger.info "Monitor running"
       
-      heartbeat_monitor_thread.join
-      done_monitor_threads.each { |t| t.join }
-      error_monitor_threads.each { |t| t.join }
-      logger.info "Shutting down monitor"
+      begin
+        heartbeat_monitor_thread.join
+        done_monitor_threads.each { |t| t.join }
+        error_monitor_threads.each { |t| t.join }
+      rescue Interrupt => e
+      end
+      
+      logger.info "Monitor is exiting"
     end
     
     private
+    
+    def statistics
+      @statistics ||= Refinery::Statistics.new
+    end
     
     def run_heartbeat_monitor
       logger.info "Starting heartbeat monitor"
@@ -52,6 +60,10 @@ module Refinery #:nodoc:
               done_message = decode_message(message.body)
               logger.debug "Done: #{done_message.inspect}"
               logger.debug "Original message: #{decode_message(done_message['original']).inspect}"
+              
+              statistics.complete_run(done_message['run_time'])
+              puts "runs: #{statistics.total_runs}, sum: #{statistics.total_runtime}, avg: #{statistics.average_runtime}"
+              
               message.delete()
             end
             sleep(5)
