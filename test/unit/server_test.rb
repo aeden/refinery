@@ -5,8 +5,8 @@ class ServerTest < Test::Unit::TestCase
       assert_not_nil Refinery::Server.logger
     end
     context "logger" do
-      should "default to ERROR level" do
-        assert_equal Logger::ERROR, Refinery::Server.logger.level
+      should "default to WARN level" do
+        assert_equal Logger::WARN, Refinery::Server.logger.level
       end
     end
   end
@@ -18,6 +18,17 @@ class ServerTest < Test::Unit::TestCase
       assert_not_nil @server.config
     end
     should "be runnable" do
+      setup_default_config
+      
+      queue = stub('queue')
+      heartbeat_queue = stub('heartbeat queue')
+      heartbeat_queue.stubs(:send_message)
+      queue_provider = stub('queue provider')
+      queue_provider.expects(:queue).with('heartbeat').returns(heartbeat_queue)
+      RightAws::SqsGen2.expects(:new).with(
+        'aki', 'sak', {:multi_thread => true}
+      ).returns(queue_provider)
+      
       assert_nothing_raised do
         thread = Thread.new do
           @server.run

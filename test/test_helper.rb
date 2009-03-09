@@ -13,7 +13,8 @@ class Test::Unit::TestCase
             'access_key_id' => 'aki',
             'secret_access_key' => 'sak'
           }
-        }
+        },
+        'processors' => []
       }
     ))
   end

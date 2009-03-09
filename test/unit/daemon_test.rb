@@ -4,6 +4,7 @@ class DaemonTest < Test::Unit::TestCase
     setup do
       @server = stub('Server')
       @waiting_queue = stub('Queue(waiting)')
+      @waiting_queue.stubs(:receive_messages).with(1, 10).returns([])
       @error_queue = stub('Queue(error)')
       @done_queue = stub('Queue(done)')
     end
