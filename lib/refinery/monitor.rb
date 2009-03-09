@@ -7,6 +7,12 @@ module Refinery #:nodoc:
     include Refinery::Queueable
     include Refinery::Utilities
     
+    # Initialize the monitor.
+    #
+    # Options:
+    # * <tt>:verbose</tt>: Enable INFO level logging
+    # * <tt>:debug</tt>: Enable DEBUG level logging
+    # * <tt>:config</tt>: The config file
     def initialize(options)
       logger.level = Logger::INFO if options[:verbose]
       logger.level = Logger::DEBUG if options[:debug]

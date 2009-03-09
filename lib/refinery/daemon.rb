@@ -8,10 +8,15 @@ module Refinery #:nodoc:
     RUNNING = 'running'
     STOPPED = 'stopped'
     
+    # The daemon's thread
     attr_reader :thread
+    # The name of the daemon
     attr_reader :name
+    # The queue for incoming messages to process
     attr_reader :waiting_queue
+    # The queue for outgoing messages once they've been processed
     attr_reader :done_queue
+    # The queue for error messages
     attr_reader :error_queue
     
     # Stop the daemon

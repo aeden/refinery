@@ -1,18 +1,20 @@
 module Refinery #:nodoc:
   # The server instance provides a runtime environment for daemons.
-  # To start the server create an Refinery::Server instance and invole run.
+  # To start the server create an Refinery::Server instance and invoke run.
   class Server
     include Refinery::Loggable
     include Refinery::Configurable
     include Refinery::Queueable
     include Refinery::Utilities
     
+    # The directory where worker source files are stored. Defaults to
+    # ./workers
     attr_accessor :workers_directory
     
     # Get a server-wide logger
     def self.logger
       @logger ||= begin
-        logger = Logger.new(STDOUT || log_to)
+        logger = Logger.new(STDOUT)
         logger.level = Logger::WARN
         logger
       end
@@ -79,10 +81,6 @@ module Refinery #:nodoc:
         daemons.each { |daemon| daemon.thread.join }
       rescue Interrupt => e
       end
-    end
-    
-    def log_to
-      File.dirname(__FILE__) + '/../../logs/server.log'
     end
   end
 end

@@ -3,7 +3,7 @@ module Refinery #:nodoc:
   class Publisher
     include Refinery::Loggable
     
-    # Initialize the publisher
+    # Initialize the publisher with the queue to publish messages to.
     def initialize(waiting_queue)
       @waiting_queue = waiting_queue
     end

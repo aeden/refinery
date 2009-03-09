@@ -1,4 +1,5 @@
-module Refinery
+module Refinery #:nodoc:
+  # Mix this module in to classes that want to access a queue.
   module Queueable
     # Get a named queue
     def queue(name)
