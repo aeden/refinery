@@ -13,7 +13,7 @@ module Refinery #:nodoc:
     def self.logger
       @logger ||= begin
         logger = Logger.new(STDOUT || log_to)
-        logger.level = Logger::ERROR
+        logger.level = Logger::WARN
         logger
       end
     end

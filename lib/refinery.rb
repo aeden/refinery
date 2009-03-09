@@ -30,6 +30,17 @@ module Refinery
     require_library('sequel', 'Sequel gem')
   end
   
+  def self.require_optional_library(short_name, display_name)
+    begin
+      require short_name
+    rescue LoadError
+    end
+  end
+  
+  def self.require_optional_libraries
+    require_optional_library('ramaze', 'Ramaze')
+  end
+  
   # Require internal code files
   def self.require_internals
     require 'refinery/loggable'
@@ -47,6 +58,7 @@ module Refinery
     require 'refinery/publisher'
     require 'refinery/monitor'
     require 'refinery/statistics'
+    require 'refinery/stats_server'
   end
   
   # Raised if a source file cannot be loaded
@@ -55,4 +67,5 @@ module Refinery
 end
 
 Refinery::require_libraries
+Refinery::require_optional_libraries
 Refinery::require_internals

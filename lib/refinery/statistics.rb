@@ -3,6 +3,8 @@ module Refinery #:nodoc:
   # about completed jobs and errors. The stats are stored in a SQL
   # database (using SQLite3 by default).
   class Statistics
+    include Refinery::Loggable
+    
     # Record the done record into the 
     def record_done(message)
       db[:completed_jobs] << {
@@ -22,7 +24,7 @@ module Refinery #:nodoc:
         :error_class => message['error']['class'],
         :error_message => message['error']['message'],
         :original_message => message['original'],
-        :time => Time.now
+        :when => Time.now
       }
     end
     

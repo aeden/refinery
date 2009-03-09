@@ -24,6 +24,8 @@ module Refinery #:nodoc:
       
       logger.info "Monitor running"
       
+      Refinery::StatsServer.new.run
+      
       begin
         heartbeat_monitor_thread.join
         done_monitor_threads.each { |t| t.join }
