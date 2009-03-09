@@ -14,3 +14,36 @@ such as Amazon's S3.
 * RightScale AWS
 * JSON
 * Moneta
+* Sequel
+
+== Optional
+
+If you want to run the stats server to view operational statistics
+about Refinery then you'll need to install Ramaze.
+
+== Executing
+
+Refinery have several executable scripts that are used to launch the various components.
+
+=== bin/refinery
+
+This command executes the refinery execution server. This is where jobs
+are run.
+
+Example: bin/refinery -c config/config.yml
+
+=== bin/epub
+
+This command executes all publishers that fire on a regular basis.
+
+Example: bin/epub -c config/config.yml
+
+=== bin/pubnow
+
+This command executes a single publisher once.
+
+Example: bin/pubnow -c config/config.yml sample
+
+=== bin/monitor
+
+This command is used to run the monitor system. The monitor system tracks the health of the refinery. The monitor should only be run on a single host.
