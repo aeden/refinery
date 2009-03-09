@@ -20,7 +20,6 @@ class ServerTest < Test::Unit::TestCase
     should "be runnable" do
       setup_default_config
       
-      queue = stub('queue')
       heartbeat_queue = stub('heartbeat queue')
       heartbeat_queue.stubs(:send_message)
       queue_provider = stub('queue provider')
