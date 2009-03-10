@@ -48,6 +48,8 @@ module Refinery
     require 'refinery/queueable'
 
     require 'refinery/utilities'
+    
+    require 'refinery/validations'
 
     require 'refinery/config'
     require 'refinery/heartbeat'
@@ -59,6 +61,7 @@ module Refinery
     require 'refinery/monitor'
     require 'refinery/statistics'
     require 'refinery/stats_server'
+    
   end
   
   # Raised if a source file cannot be loaded

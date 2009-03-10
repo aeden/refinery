@@ -1,19 +1,29 @@
 module Refinery #:nodoc:
   # Base class for workers. Please subclasses of this in the workers
   # directory.
+  #
+  # Workers may include validation logic to verify that the message 
+  # has the correct keys and values before processing.
   class Worker 
     include Refinery::Loggable
     include Refinery::Configurable
     include Refinery::Utilities
+    include Refinery::Validations
     
     # Initialize the worker with the given daemon.
     def initialize(daemon)
       @daemon = daemon
     end
     
-    # Run the worker with the given message. The worker should return true
+    # Run the worker with the given message. The result from the worker's
+    # <code>execute</code> method is returned along with the run time.
+    #
+    # Validation will occur prior to calling execute.
     def run(message)
       result = false
+      
+      validate(message)
+      
       logger.debug "Executing worker #{self.class.name}"
       time = Benchmark.realtime do
         result = execute(message)
