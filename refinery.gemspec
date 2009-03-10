@@ -4,16 +4,17 @@ spec = Gem::Specification.new do |s|
   s.summary = "Refinery processes data in a distributed environment."
   s.description = %{Process data in a distributed fashion.}
   s.files = [
-    Dir['lib/**/*.rb'],
-    Dir['test/**/*.rb'],
-    Dir['docs/**/*'],
     Dir['bin/**/*'],
     Dir['config/config.example.yml'],
+    Dir['docs/**/*'],
+    Dir['lib/**/*.rb'],
     'logs',
     'publishers',
-    'workers',
+    'Rakefile',
     'README.rdoc',
-    'README.textile'
+    'README.textile',
+    Dir['test/**/*.rb'],
+    'workers',
   ].flatten
   s.require_path = 'lib'
   s.bindir = 'bin'
