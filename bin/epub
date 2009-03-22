@@ -18,7 +18,7 @@
 #    specify a configuration file
 #
 # -p, --publishers directory
-#    specify the directory for finding workers
+#    specify the directory for finding publishers
 #
 # -v, --verbose
 #    print info to the standard output

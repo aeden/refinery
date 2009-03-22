@@ -23,7 +23,7 @@ about Refinery then you'll need to install Ramaze.
 
 == Executing
 
-Refinery have several executable scripts that are used to launch the various components.
+Refinery have several executable scripts that are used to launch the various components:
 
 === bin/refinery
 
