@@ -59,36 +59,40 @@ module Refinery #:nodoc:
       @thread = Thread.new(self) do |daemon|
         logger.debug "Running daemon thread"
         while(running?)
-          daemon.waiting_queue.receive_messages(1, 10).each do |message|
-            worker = load_worker_class(name).new(self)
-            begin
-              result, run_time = worker.run(decode_message(message.body))
-              if result
-                done_message = {
-                  'host_info' => host_info,
-                  'original' => message.body,
-                  'run_time' => run_time
-                }
-                logger.debug "Sending 'done' message to #{done_queue.name}"
-                done_queue.send_message(encode_message(done_message))
+          begin
+            while (message = waiting_queue.receive)
+              worker = load_worker_class(name).new(self)
+              begin
+                result, run_time = worker.run(decode_message(message.body))
+                if result
+                  done_message = {
+                    'host_info' => host_info,
+                    'original' => message.body,
+                    'run_time' => run_time
+                  }
+                  logger.debug "Sending 'done' message to #{done_queue.name}"
+                  done_queue.send_message(encode_message(done_message))
                 
-                logger.debug "Deleting message from queue"
+                  logger.debug "Deleting message from queue"
+                  message.delete()
+                end
+              rescue Exception => e
+                error_message = {
+                  'error' => {
+                    'message' => e.message, 
+                    'class' => e.class.name
+                  }, 
+                  'host_info' => host_info,
+                  'original' => message.body
+                }
+                error_queue.send_message(encode_message(error_message))
                 message.delete()
               end
-            rescue Exception => e
-              error_message = {
-                'error' => {
-                  'message' => e.message, 
-                  'class' => e.class.name
-                }, 
-                'host_info' => host_info,
-                'original' => message.body
-              }
-              error_queue.send_message(encode_message(error_message))
-              message.delete()
             end
+            sleep(1)
+          rescue Exception => e
+            logger.error "An error occurred while receiving from the waiting queue: #{e.message}"
           end
-          sleep(1)
         end
         logger.debug "Exiting daemon thread"
       end

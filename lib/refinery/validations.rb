@@ -34,6 +34,7 @@ module Refinery #:nodoc:
         end
       end
       alias :validates_key_exists :validate_key_exists
+      alias :validates_presence_of :validate_key_exists
     end
     
     # Validate the given message
