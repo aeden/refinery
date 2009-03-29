@@ -1,5 +1,5 @@
 module Refinery #:nodoc:
-  # Base class for workers. Please subclasses of this in the workers
+  # Base class for workers. Place subclasses of this in the workers
   # directory.
   #
   # Workers may include validation logic to verify that the message 
