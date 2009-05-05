@@ -26,7 +26,12 @@ module Refinery #:nodoc:
       
       logger.debug "Executing worker #{self.class.name}"
       time = Benchmark.realtime do
-        result = execute(message)
+        begin
+          result = execute(message)
+        rescue Exception => e
+          logger.error "Error executing worker #{self.class.name}: #{e.message}"
+          raise e
+        end
       end
       logger.debug "Completed worker #{self.class.name} in #{time} seconds"
       return result, time
