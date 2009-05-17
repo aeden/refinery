@@ -24,6 +24,14 @@ class DaemonTest < Test::Unit::TestCase
       should "have a state of running" do
         assert @daemon.running?
       end
+      context "after calling stop" do
+        setup do
+          @daemon.stop
+        end
+        should "not be running" do
+          assert !@daemon.running?
+        end
+      end
     end
   end
 end

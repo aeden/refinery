@@ -21,7 +21,7 @@ module Refinery #:nodoc:
     
     # Stop the daemon
     def stop
-      state = STOPPED
+      self.state = STOPPED
     end
     
     # Return the daemon state
