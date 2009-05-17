@@ -9,6 +9,7 @@ module Refinery #:nodoc:
     include Refinery::Configurable
     include Refinery::Utilities
     include Refinery::Validations
+    include Refinery::Queueable
     
     # Initialize the worker with the given daemon.
     def initialize(daemon)

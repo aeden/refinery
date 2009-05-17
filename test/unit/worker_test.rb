@@ -33,5 +33,12 @@ class WorkerTest < Test::Unit::TestCase
       setup_default_config
       assert_not_nil @worker.data_store(options)
     end
+    should "provide a queue" do
+      queue = stub('queue')
+      queue_provider = stub('queue provider')
+      queue_provider.expects(:queue).with('a_queue').returns(queue)
+      @worker.expects(:queue_provider).returns(queue_provider)      
+      assert_not_nil @worker.queue('a_queue')
+    end
   end
 end
