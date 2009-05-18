@@ -1,3 +1,9 @@
-h1. Refinery
+---
+title: Refinery
+github_name: aeden-refinery
+current_version: 0.0.0
+---
 
-* "Tutorial 1":tutorial-1.html
+h1(project_name). {{ page.github_name }}
+
+* "Tutorial 1":http://aeden.github.com/refinery/tutorial-1
