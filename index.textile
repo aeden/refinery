@@ -6,4 +6,4 @@ current_version: 0.0.0
 
 h1(project_name). {{ page.github_name }}
 
-* "Tutorial 1":http://aeden.github.com/refinery/tutorial-1
+* "Tutorial 1":/refinery/tutorial-1.html
