@@ -1,0 +1,322 @@
+h1. Refinery Tutorial 1
+
+Refinery provides a framework for building workers that can process data in a distributed fashion using Amazon's web services. It uses the Amazon Simple Queue Service for all messaging requirements and can integrate with S3 easily to access shared data.
+
+This tutorial provides an introduction to the Refinery framework by walking you through the creation and integration of a distributed worker into a Rails application.
+
+Before you get started you'll need to have some things installed:
+
+# Ruby on Rails (2.2 or higher)
+# The refinery gem
+# The RightAWS gem
+# Image Magick
+# The mini_magick gem
+# The Moneta gem
+# The HTTParty gem
+
+Additionally you will need to have an Amazon Web Services account with S3 and SQS activated.
+
+h2. Step 1: Create a new Rails application
+
+The first thing to do is to create a fresh Rails application. I'm using Rails 2.3 but you should be able to use any version of Rails 2.2 and higher.
+
+<code>rails refinery_example</code>
+
+In environment.rb add the following to the <code>Rails::Initializer.run do |config|</code> block:
+
+<pre>
+  config.gem 'right_aws'
+  config.gem 'right_http_connection'
+</pre>
+
+h2. Step 2: Install D2S3 Plugin
+
+We will use the "D2S3 plugin":http://github.com/mwilliams/d2s3 to upload image files directly to Amazon's S3, bypassing our web application server. The benefit of this approach is that there is no need for a server process to handle the incoming image data as it will uploaded directly to S3.
+
+<code>script/plugin install git://github.com/mwilliams/d2s3.git</code>
+
+h2. Step 3: Create an Asset model
+
+<code>script/generate model asset filename:string status:string</code>
+
+This creates an Asset model with a <code>filename</code> attribute and the standard <code>created_at</code> and <code>updated_at</code> attributes that all Rails models get by default. We'll come back to the model later to add a little bit of logic, but for now let's move on.
+
+h2. Step 4: Create an AssetsController
+
+<code>script generate controller assets index new complete_upload</code>
+
+Edit the controller and add the following at the top:
+
+<pre>
+  skip_before_filter :verify_authenticity_token
+</pre>
+
+This will disable the built in Rails forgery protection thus allowing the HTTP callback (more later).
+
+The index action load all of the Asset instances:
+
+<pre>
+  def index
+    @assets = Asset.find(:all)
+  end
+</pre>
+
+The new action will simply display the upload form.
+
+The complete_upload action:
+
+<pre>
+  def complete_upload
+    path, filename = File.split(params[:key])
+    asset = Asset.create!(:filename => filename)
+  
+    queue = sqs.queue('process_asset_waiting')
+    message = {
+      "bucket" => params[:bucket], 
+      "s3_key" => params[:key], 
+      "asset_id" => asset.id
+    }.to_json
+    queue.send_message(Base64.encode64(message))
+  
+    flash[:notice] = 'Your file has been uploaded and is being processed.'
+    redirect_to assets_url
+  end
+</pre>
+
+The first line splits the key that is passed when the upload completes. This key is the location of the newly uploaded file in Amazon's S3. The key is split into its path and filename using <code>File.split</code>. The next line creates a new Asset instance with the filename part.
+
+The next section of code gets an SQS Queue instance and constructs a JSON message and publishes a base-64 encoded version to the queue. The message includes the name of the bucket where the file was uploaded, the key for the file and the asset ID for the asset instance that was just created.
+
+Finally a flash notice is set and the browser is redirected to the <code>assets_url</code>.
+
+The complete action will be used as for an HTTP callback to indicate that the asset has been processed:
+
+<pre>
+  def complete
+    asset = Asset.find(params[:id])
+    asset.complete if asset
+    render :nothing => true
+  end
+</pre>
+
+You'll also need to add an entry into routes.rb so that the Asset resource and it's additional controller actions are available:
+
+<pre>
+  map.resources :assets, {
+    :collection => {'complete_upload' => :get}, 
+    :member => {'complete' => :post}
+  }
+</pre>
+
+h2. Step 5: Implement the Worker
+
+Create a workers directory in the <code>refinery_example</code> directory. This is where you will put the worker for this example. In a larger project you'll probably want to separate your Refinery code from your Rails application so that it is easier to distribute across one or more instances. For now though it's just as easy to keep it in the same project as your Rails application.
+
+All workers extend from <code>Refinery::Worker</code> and must implement an <code>execute</code> method that accepts a single argument, <code>message</code>.
+
+<pre>
+  class ProcessAsset < Refinery::Worker
+    def execute(message)
+      # the code to do the work goes here
+    end
+  end
+</pre>
+
+Inside of your worker you have access to several methods that ease development. You can access a logger at any point by using the <code>logger</code> method. This will return a Ruby <code>Logger</code> instance. You can also access S3 using the <code>data_store</code> method. This method will return an instance of <code>Moneta::S3</code> by default. This is an implementation of the Moneta key/value interface that is backed by S3. More information on Moneta can be found in the "Github project for Moneta":http://github.com/wycats/moneta/.
+
+Let's look at what the body of the execute method is going to look like for this worker:
+
+<pre>
+  def execute(message)
+    logger.info "Message received: #{message.inspect}"
+  
+    s3_key = message['s3_key']
+    bucket = message['bucket']
+    asset_id = message['asset_id']
+  
+    logger.info "Processing #{s3_key} in bucket #{bucket}"
+  
+    path, file = File.split(s3_key)
+    s3_thumb_key = File.join('storage', asset_id.to_s, "thumb-#{file}")
+    s3_small_key = File.join('storage', asset_id.to_s, "small-#{file}")
+    s3_original_key = File.join('storage', asset_id.to_s, "original-#{file}")
+  
+    ds = data_store(:bucket => bucket)
+    image = MiniMagick::Image.from_blob(ds[s3_key], "jpg")
+  
+    ds.store(s3_original_key, image.to_blob, :perms => 'public-read')
+  
+    image.resize "100x100"
+    ds.store(s3_small_key, image.to_blob, :perms => 'public-read')
+  
+    image.resize "24x24"
+    ds.store(s3_thumb_key, image.to_blob, :perms => 'public-read')
+  
+    ds.delete(s3_key)
+  
+    logger.info "Completed processing #{s3_key}, wrote to #{s3_small_key}"
+
+    return true
+  end
+</pre>
+
+All of the lines with logger.info will print log messages if the logger is set to info level. Let's look at the other lines. The following lines extract data from the message:
+
+<pre>
+  s3_key = message['s3_key']
+  bucket = message['bucket']
+  asset_id = message['asset_id']
+</pre>
+
+The next four lines create some key names that will be used for the files after they've been processed:
+
+<pre>
+  path, file = File.split(s3_key)
+  s3_thumb_key = File.join('storage', asset_id.to_s, "thumb-#{file}")
+  s3_small_key = File.join('storage', asset_id.to_s, "small-#{file}")
+  s3_original_key = File.join('storage', asset_id.to_s, "original-#{file}")
+</pre>
+
+Next an instance of the data store interface is acquired:
+
+<pre>
+  ds = data_store(:bucket => bucket)
+</pre>
+
+With that data store instance we can get the raw data for the JPEG image from the S3 bucket and process that data blob with "MiniMagick":http://rubyforge.org/projects/mini-magick
+
+<pre>
+  image = MiniMagick::Image.from_blob(ds[s3_key], "jpg")
+</pre>
+
+The next lines store the original image, a small version of the image that is 100 pixels by 100 pixels and a thumbnail that is 24 pixels by 24 pixels. Each of the images is stored using the public-read permissions which will allow them to be read directly from S3 later.
+
+<pre>
+  ds.store(s3_original_key, image.to_blob, :perms => 'public-read')
+  
+  image.resize "100x100"
+  ds.store(s3_small_key, image.to_blob, :perms => 'public-read')
+  
+  image.resize "24x24"
+  ds.store(s3_thumb_key, image.to_blob, :perms => 'public-read')
+</pre>
+
+Next, the uploaded raw data is deleted from S3:
+
+<pre>
+  ds.delete(s3_key)
+</pre>
+
+Finally an HTTP post is made to the AssetsController#complete action to indicate that the file has been processed:
+
+<pre>
+  
+</pre>
+
+And the method returns <code>true</code>. Returning <code>true</code> is important as it causes the Refinery engine to delete the message from SQS.
+
+h2. Step 6: Uploading the Raw Image
+
+To provide the interface to upload the image, we add the following code to <code>views/assets/new.html.erb</code>:
+
+<pre>
+  <p>Upload JPEG image:</p>
+  
+  <%= s3_http_upload_tag 
+        :key => 'uploads', 
+        :content_type => 'image/jpeg', 
+        :redirect => complete_upload_assets_url,
+        :acl => 'private',
+        :max_filesize => 5.megabytes %>
+</pre>
+
+This helper comes from the D2S3 project. The options used here include:
+
+* <tt>:key</tt>: The prefix to the S3 key. The filename will be appended to this prefix.
+* <tt>:content_type</tt>: The content type for the uploaded file. In this case we'll only accept JPEG images.
+* <tt>:redirect</tt>: The destination that will be redirected to following the upload.
+* <tt>:acl</tt>: The access control on the uploaded file.
+* <tt>:max_filesize</tt>: The maximum file size that is allowed.
+
+There are other options as well. Take a look at <code>d2s3/view_helpers.rb</code> in the d2s3 project's lib directory for more options.
+
+h2. Step 7: Displaying the Processed Image
+
+Let's go back over to the Rails app and look at the views. First let's look at <code>views/assets/index.html.erb</code>:
+
+<pre>
+  <%  if flash[:notice] -%>
+  <div class="notice"><%= flash[:notice] %></div>
+  <%  end -%>
+
+  <%= link_to 'Add an Asset', new_asset_url %>
+
+  <ul>
+  <%  @assets.each do |asset| -%>
+    <li><%= asset.done? ? image_tag(asset.small_url) : 'Processing' %></li>
+  <%  end -%>
+  </ul>
+</pre>
+
+There's not much going on here. The first 3 lines display the flash notice if necessary, the next line links to the new assets action and the remaining lines loop through the assets and render the small version of the image if the asset is done processing.
+
+The Asset model provides the last bit of logic to help construct the small image url and to update a status value upon processing completion:
+
+<pre>
+  class Asset < ActiveRecord::Base
+    def small_url
+      "https://#{bucket}.s3.amazonaws.com/storage/#{id}/small-#{filename}"
+    end
+  
+    def complete
+      update_attribute(:status, 'done')
+    end
+  
+    def done?
+      status == 'done'
+    end
+  
+    private
+    def bucket
+      D2S3::S3Config.bucket
+    end
+  end
+</pre>
+
+To keep things simple we just use the <code>D2S3::S3Config</code> class to get the bucket instance. We then construct a URL directly to the resource on S3. Once the image has been processed it will appear in the list.
+
+h2. Step 8: Make it Run!
+
+The final step is to create a refinery configuration file, start the Refinery and start up the a server for Rails.
+
+Create a file called refinery.yml in the config directory. Include the following text:
+
+<pre>
+aws:
+  credentials:
+    access_key_id: "ACCESS_KEY_ID"
+    secret_access_key: "SECRET_ACCESS_KEY"
+processors:
+  process_asset:
+    publishers:
+    workers:
+      initial: 1
+</pre>
+
+Replace ACCESS_KEY_ID with your Amazon Web Services access key ID and SECRET_ACCESS_KEY with your Amazon Web Services secret access key. The processors section defines each of the processors that are deployed in your Refinery instance.
+
+From within the refinery_example directory execute the following command: <code>refinery -c config/refinery.yml -w workers -d</code>
+
+The command options provide the path to the config/refinery.yml file (using -c or --config) the path to the workers directory (using -w or --workers) and indicate that the logging level is debug (using -d or --debug). Once you've run the refinery command you should have a running refinery instance.
+
+Next start up your Rails instance in another terminal using the command <code>script/server</code>.
+
+Finally, open a web browser and navigate to "http://localhost:3000/assets":http://localhost:3000/assets. Click on "Add an Asset" to go to the new asset screen. Upload a JPEG file. Upon completion of the upload you'll be returned to the assets index. You will most likely see the word "Processing" next to the first bullet item. Take a look at the terminal where refinery is running and you should see log messages telling you about refinery's activity. Once refinery receives the message posted by your Rails app it will process the data, which you'll see in the logs. Once it has processed the image, go back to your Rails app and reload the assets index and you will see the small version of the image you uploaded.
+
+Keep in mind that at no time did the binary data need to go through your application server: it was uploaded directly to S3 and processed without requiring any sort of blocking on your server.
+
+h2. Conclusion
+
+I hope this has given you a taste of what you can do with Refinery. In the next tutorial I will demonstrate how you can use Refinery publishers to easily publish messages using a scheduled cron job. Thanks for using Refinery!
+
+For additional information on Refinery please visit "http://github.com/aeden/refinery":http://github.com/aeden/refinery
