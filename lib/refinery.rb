@@ -27,7 +27,6 @@ module Refinery
     require_library('json', 'JSON gem')
     require_library('moneta', 'Moneta gem')
     require_library('moneta/s3', 'Moneta S3 implementation')
-    require_library('sequel', 'Sequel gem')
   end
   
   def self.require_optional_library(short_name, display_name)
@@ -38,6 +37,7 @@ module Refinery
   end
   
   def self.require_optional_libraries
+    require_optional_library('sequel', 'Sequel gem')
     require_optional_library('ramaze', 'Ramaze')
   end
   
