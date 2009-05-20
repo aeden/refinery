@@ -6,4 +6,6 @@ current_version: 0.0.0
 
 h1(project_name). {{ page.github_name }}
 
-* "Tutorial 1":/refinery/tutorial-1.html
+Refinery provides a framework for building workers that can process data in a distributed fashion using Amazon's web services. It uses the Amazon Simple Queue Service for all messaging requirements and can integrate with S3 easily to access shared data.
+
+* "Refinery Tutorial 1":http://wiki.github.com/aeden/refinery/refinery-tutorial-1
