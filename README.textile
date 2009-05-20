@@ -9,17 +9,18 @@ image processing on web application servers.
 Interprocess messaging is accomplished through a distributed queue system such as Amazon SQS and data storage is accomplished through a distributed data store
 such as Amazon's S3.
 
-h2. Requirements
+h2. Required Libraries
 
 * RightScale AWS
 * JSON
 * Moneta
-* Sequel
 
-h2. Optional
+h2. Optional Libraries
+
+If you want to run the monitor then you'll need to install Sequel and have SQLite3 installed.
 
 If you want to run the stats server to view operational statistics
-about Refinery then you'll need to install Ramaze.
+about Refinery then you'll need to install Sequel, SQLite3 and Ramaze.
 
 h2. Executing
 
