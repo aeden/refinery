@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
   s.name = 'refinery'
-  s.version = '0.1'
+  s.version = '0.9.0'
   s.summary = "Refinery processes data in a distributed environment."
   s.description = %{Process data in a distributed fashion.}
   s.files = [
