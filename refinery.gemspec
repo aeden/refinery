@@ -13,6 +13,8 @@ spec = Gem::Specification.new do |s|
     'Rakefile',
     'README.rdoc',
     'README.textile',
+    'LICENSE',
+    'CHANGELOG',
     Dir['test/**/*.rb'],
     'workers',
   ].flatten
@@ -24,6 +26,6 @@ spec = Gem::Specification.new do |s|
   s.rdoc_options << '--title' <<  'Refinery - Distributed Processing'
   s.author = "Anthony Eden"
   s.email = "anthonyeden@gmail.com"
-  s.homepage = 'http://anthonyeden.com/projects/refinery'
+  s.homepage = 'http://github.com/aeden/refinery'
   s.rubyforge_project = 'refinery'
 end
