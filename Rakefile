@@ -32,6 +32,7 @@ begin
     gemspec.description = "Process data in a distributed fashion."
     gemspec.authors = ["Anthony Eden"]
     gemspec.files.exclude 'docs/**/*'
+    gemspec.rubyforge_project = 'refinery'
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
