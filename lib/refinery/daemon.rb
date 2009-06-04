@@ -118,7 +118,7 @@ module Refinery #:nodoc:
         raise SourceFileNotFound, "Source file not found: #{source_file}"
       end
       
-      Object.const_get(camelize(name))
+      Object.const_get(camelize("#{name}_worker"))
     end
   end
 end

@@ -113,7 +113,7 @@ module Refinery #:nodoc:
         raise SourceFileNotFound, "Source file not found: #{source_file}"
       end
       
-      Object.const_get(camelize(key))
+      Object.const_get(camelize("#{key}_publisher"))
     end
     
   end
