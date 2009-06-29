@@ -46,9 +46,11 @@ module Refinery #:nodoc:
     
     # Run the specified publisher once and return
     def run_once(key)
+      prefix = config['prefix'] || ''
       settings = config['processors'][key]
       raise RuntimeError, "No processor configuration found for #{key}" unless settings
       queue_name = settings['queue'] || key
+      queue_name = "#{prefix}#{queue_name}"
       logger.debug "Using queue #{queue_name}_waiting"
       waiting_queue = queue("#{queue_name}_waiting")
       load_publisher_class(key).new(waiting_queue).execute
@@ -78,8 +80,10 @@ module Refinery #:nodoc:
     
     # Run the publisher for the given key
     def run_publisher(key, settings)
+      prefix = config['prefix'] || ''
       logger.info "Creating publisher for #{key}"
       queue_name = settings['queue'] || key
+      queue_name = "#{prefix}#{queue_name}"
       logger.debug "Using queue #{queue_name}_waiting"
       waiting_queue = queue("#{queue_name}_waiting")
       
