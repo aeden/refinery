@@ -94,7 +94,7 @@ module Refinery #:nodoc:
                 message.delete()
               end
             end
-            sleep(1)
+            sleep(settings['sleep'] || 5)
           rescue Exception => e
             logger.error "An error occurred while receiving from the waiting queue: #{e.message}"
           end

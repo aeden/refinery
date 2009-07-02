@@ -59,7 +59,7 @@ module Refinery #:nodoc:
           rescue Exception => e
             logger.error e
           end
-          sleep(2)
+          sleep(5)
         end
       end
     end
@@ -82,7 +82,7 @@ module Refinery #:nodoc:
             rescue Exception => e
               logger.error e
             end
-            sleep(2)
+            sleep(5)
           end
         end
       end
@@ -106,7 +106,7 @@ module Refinery #:nodoc:
             rescue Exception => e
               logger.error e
             end
-            sleep(2)
+            sleep(5)
           end
         end
       end
