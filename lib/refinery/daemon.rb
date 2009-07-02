@@ -47,7 +47,12 @@ module Refinery #:nodoc:
     # * <tt>waiting_queue</tt>: The waiting queue that provides messages to be processed
     # * <tt>error_queue</tt>: The queue where errors are posted.
     # * <tt>done_queue</tt>: The queue for messages that have been processed.
-    def initialize(server, name, waiting_queue, error_queue, done_queue)
+    # * <tt>settings</tt>: The settings hash from the config.
+    #
+    # The settings hash may contain the following options:
+    # * <tt>visibility</tt>: The time in seconds that the message is hidden
+    # in the queue.
+    def initialize(server, name, waiting_queue, error_queue, done_queue, settings={})
       Refinery::Server.logger.debug "Starting daemon"
       
       @server = server
@@ -57,10 +62,10 @@ module Refinery #:nodoc:
       @done_queue = done_queue
       
       @thread = Thread.new(self) do |daemon|
-        logger.debug "Running daemon thread"
+        logger.debug "Running daemon thread: #{name} (settings: #{settings.inspect})"
         while(running?)
           begin
-            while (message = waiting_queue.receive)
+            while (message = waiting_queue.receive(settings['visibility']))
               worker = load_worker_class(name).new(self)
               begin
                 result, run_time = worker.run(decode_message(message.body))

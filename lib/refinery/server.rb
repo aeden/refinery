@@ -71,7 +71,7 @@ module Refinery #:nodoc:
         done_queue = queue("#{queue_name}_done")
         
         1.upto(settings['workers']['initial']) do
-          daemons << Refinery::Daemon.new(self, key, waiting_queue, error_queue, done_queue)
+          daemons << Refinery::Daemon.new(self, key, waiting_queue, error_queue, done_queue, settings)
         end
         
         logger.debug "Running #{daemons.length} daemons"

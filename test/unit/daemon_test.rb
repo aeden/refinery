@@ -17,6 +17,10 @@ class DaemonTest < Test::Unit::TestCase
       daemon = Refinery::Daemon.new(@server, 'sample', @waiting_queue, @error_queue, @done_queue)
       assert_not_nil daemon.logger
     end
+    should "allow visibility setting" do
+      @waiting_queue.stubs(:receive).with({'visibility' => 600})
+      daemon = Refinery::Daemon.new(@server, 'sample', @waiting_queue, @error_queue, @done_queue, {'visibility' => 600})
+    end
     context "that is started" do
       setup do
         @daemon = Refinery::Daemon.new(@server, 'sample', @waiting_queue, @error_queue, @done_queue)
