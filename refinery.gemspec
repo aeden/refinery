@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{refinery}
-  s.version = "0.9.6"
+  s.version = "0.9.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Anthony Eden"]
-  s.date = %q{2009-07-02}
+  s.date = %q{2009-07-06}
   s.description = %q{Process data in a distributed fashion.}
   s.email = %q{anthonyeden@gmail.com}
   s.executables = ["epub", "monitor", "pubnow", "refinery"]
