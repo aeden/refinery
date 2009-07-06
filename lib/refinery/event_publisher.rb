@@ -80,32 +80,40 @@ module Refinery #:nodoc:
     
     # Run the publisher for the given key
     def run_publisher(key, settings)
-      prefix = config['prefix'] || ''
-      logger.info "Creating publisher for #{key}"
-      queue_name = settings['queue'] || key
-      queue_name = "#{prefix}#{queue_name}"
-      logger.debug "Using queue #{queue_name}_waiting"
-      waiting_queue = queue("#{queue_name}_waiting")
+      if File.exists?(source_file(key))
+        prefix = config['prefix'] || ''
+        logger.info "Creating publisher for #{key}"
+        queue_name = settings['queue'] || key
+        queue_name = "#{prefix}#{queue_name}"
+        logger.debug "Using queue #{queue_name}_waiting"
+        waiting_queue = queue("#{queue_name}_waiting")
       
-      threads << Thread.new(waiting_queue, settings) do |waiting_queue, settings|
-        while(running?)
-          begin
-            load_publisher_class(key).new(waiting_queue).execute
-          rescue Exception => e
-            logger.error e
-            raise e
+        threads << Thread.new(waiting_queue, settings) do |waiting_queue, settings|
+          while(running?)
+            begin
+              load_publisher_class(key).new(waiting_queue).execute
+            rescue Exception => e
+              logger.error e
+              raise e
+            end
+          
+            delay = settings['publishers']['delay'] || 60
+            logger.debug "Sleeping #{delay} seconds"
+            sleep delay
+          
           end
-          
-          delay = settings['publishers']['delay'] || 60
-          logger.debug "Sleeping #{delay} seconds"
-          sleep delay
-          
         end
+      else
+        logger.warn "No publisher found for #{key}"
       end
     end
     
-    def load_publisher_class(key)
+    def source_file(key)
       source_file = "#{publishers_directory}/#{key}.rb"
+    end
+    
+    def load_publisher_class(key)
+      source_file = source_file(key)
       if File.exist?(source_file)
         modified_at = File.mtime(source_file)
         if publishers[key] != modified_at
