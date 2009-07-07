@@ -97,6 +97,7 @@ module Refinery #:nodoc:
             sleep(settings['sleep'] || 5)
           rescue Exception => e
             logger.error "An error occurred while receiving from the waiting queue: #{e.message}"
+            sleep(30) # try to let things recover a bit
           end
         end
         logger.debug "Exiting daemon thread"
