@@ -56,7 +56,7 @@ module Refinery #:nodoc:
       )
     end
     
-    private
+    protected
     # Get's the config element starting at the processer
     def processor_config
       config['processors'][daemon.name]
