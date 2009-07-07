@@ -16,6 +16,7 @@ module Refinery #:nodoc:
       @logger ||= begin
         logger = Logger.new(STDOUT)
         logger.level = Logger::WARN
+        logger.formatter = CustomFormatter.new
         logger
       end
     end
@@ -83,6 +84,18 @@ module Refinery #:nodoc:
         daemons.each { |daemon| daemon.thread.join }
       rescue Interrupt => e
       end
+    end
+  end
+  
+  class CustomFormatter
+    def format
+      @format ||= "%s, [%s#%d][%s] %5s -- %s: %s\n"
+    end
+    def call(severity, time, progname, msg)
+      format % [severity[0..0], format_datetime(time), $$, Thread.current.object_id.to_s, severity, progname, msg.to_s]
+    end
+    def format_datetime(time)
+      time.strftime("%Y-%m-%dT%H:%M:%S.") << "%06d " % time.usec
     end
   end
 end
