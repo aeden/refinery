@@ -22,6 +22,7 @@ module Refinery #:nodoc:
             sleep(60)
           rescue Exception => e
             logger.error "Error sending heartbeat: #{e.message}"
+            sleep(30)
           end
         end
       end
