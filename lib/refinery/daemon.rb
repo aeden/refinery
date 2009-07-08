@@ -90,6 +90,7 @@ module Refinery #:nodoc:
                   'host_info' => host_info,
                   'original' => message.body
                 }
+                logger.error "Sending 'error' message to #{error_queue.name}: #{e.message}"
                 error_queue.send_message(encode_message(error_message))
                 message.delete()
               end
@@ -97,7 +98,10 @@ module Refinery #:nodoc:
             sleep(settings['sleep'] || 5)
           rescue Exception => e
             logger.error "An error occurred while receiving from the waiting queue: #{e.message}"
-            sleep(30) # try to let things recover a bit
+            # delay to try to get past the issue with the queue
+            sleep(30)
+            # assign a new queue instance
+            @waiting_queue = queue(waiting_queue.name)
           end
         end
         logger.debug "Exiting daemon thread"
