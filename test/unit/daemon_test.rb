@@ -6,26 +6,40 @@ class DaemonTest < Test::Unit::TestCase
       @waiting_queue = stub('Queue(waiting)')
       @error_queue = stub('Queue(error)')
       @done_queue = stub('Queue(done)')
+      
+      Refinery::Daemon.any_instance.stubs(:queue).with(
+      'sample_waiting').returns(@waiting_queue)
+      Refinery::Daemon.any_instance.stubs(:queue).with(
+      'sample_error').returns(@error_queue)
+      Refinery::Daemon.any_instance.stubs(:queue).with(
+      'sample_done').returns(@done_queue)
     end
     should "be startable" do
       @waiting_queue.stubs(:receive)
       assert_nothing_raised do
-        daemon = Refinery::Daemon.new(@server, 'sample', @waiting_queue, @error_queue, @done_queue)
+        daemon = Refinery::Daemon.new(@server, 'sample')
       end
     end
     should "have logging" do
       @waiting_queue.stubs(:receive)
-      daemon = Refinery::Daemon.new(@server, 'sample', @waiting_queue, @error_queue, @done_queue)
+      daemon = Refinery::Daemon.new(@server, 'sample')
       assert_not_nil daemon.logger
     end
     should "allow visibility setting" do
       @waiting_queue.expects(:receive).with(600)
-      daemon = Refinery::Daemon.new(@server, 'sample', @waiting_queue, @error_queue, @done_queue, {'visibility' => 600})
+      daemon = Refinery::Daemon.new(@server, 'sample', '', {'visibility' => 600})
+    end
+    should "have a queue name" do
+      @waiting_queue.stubs(:receive)
+      Refinery::Daemon.any_instance.stubs(:queue).with(
+      'prefix_sample_waiting').returns(@waiting_queue)
+      daemon = Refinery::Daemon.new(@server, 'sample', 'prefix_')
+      assert_equal 'prefix_sample', daemon.queue_name
     end
     context "that is started" do
       setup do
         @waiting_queue.stubs(:receive)
-        @daemon = Refinery::Daemon.new(@server, 'sample', @waiting_queue, @error_queue, @done_queue)
+        @daemon = Refinery::Daemon.new(@server, 'sample')
       end
       should "have a state of running" do
         assert @daemon.running?

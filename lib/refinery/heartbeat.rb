@@ -9,9 +9,9 @@ module Refinery #:nodoc:
     # Initialize the heartbeat for the given server.
     def initialize(server)
       @server = server
-      @thread = Thread.new(queue('heartbeat')) do |heartbeat_queue|
+      @thread = Thread.new do
         loop do
-          begin
+          with_queue('heartbeat') do |heartbeat_queue|
             logger.debug "Send heartbeat"
             message = {
               'host_info' => host_info,
@@ -20,9 +20,6 @@ module Refinery #:nodoc:
             }
             heartbeat_queue.send_message(Base64.encode64(message.to_json))
             sleep(60)
-          rescue Exception => e
-            logger.error "Error sending heartbeat: #{e.message}"
-            sleep(30)
           end
         end
       end

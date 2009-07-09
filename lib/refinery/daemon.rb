@@ -4,6 +4,7 @@ module Refinery #:nodoc:
     include Refinery::Loggable
     include Refinery::Configurable
     include Refinery::Utilities
+    include Refinery::Queueable
     
     RUNNING = 'running'
     STOPPED = 'stopped'
@@ -12,12 +13,10 @@ module Refinery #:nodoc:
     attr_reader :thread
     # The name of the daemon
     attr_reader :name
-    # The queue for incoming messages to process
-    attr_reader :waiting_queue
-    # The queue for outgoing messages once they've been processed
-    attr_reader :done_queue
-    # The queue for error messages
-    attr_reader :error_queue
+    # The settings for the daemon
+    attr_reader :settings
+    # The base queue name
+    attr_reader :queue_name
     
     # Stop the daemon
     def stop
@@ -52,56 +51,57 @@ module Refinery #:nodoc:
     # The settings hash may contain the following options:
     # * <tt>visibility</tt>: The time in seconds that the message is hidden
     # in the queue.
-    def initialize(server, name, waiting_queue, error_queue, done_queue, settings={})
+    def initialize(server, name, queue_prefix='', settings={})
       Refinery::Server.logger.debug "Starting daemon"
       
       @server = server
       @name = name
-      @waiting_queue = waiting_queue
-      @error_queue = error_queue
-      @done_queue = done_queue
+      @settings = settings
+      
+      queue_name = settings['queue'] || name
+      queue_name = "#{queue_prefix}#{queue_name}"
+      logger.debug "Using queue #{queue_name}"
+      @queue_name = queue_name
       
       @thread = Thread.new(self) do |daemon|
         logger.debug "Running daemon thread: #{name} (settings: #{settings.inspect})"
         while(running?)
-          begin
+          with_queue("#{queue_name}_waiting") do |waiting_queue|
             while (message = waiting_queue.receive(settings['visibility']))
               worker = load_worker_class(name).new(self)
               begin
                 result, run_time = worker.run(decode_message(message.body))
                 if result
-                  done_message = {
-                    'host_info' => host_info,
-                    'original' => message.body,
-                    'run_time' => run_time
-                  }
-                  logger.debug "Sending 'done' message to #{done_queue.name}"
-                  done_queue.send_message(encode_message(done_message))
+                  with_queue("#{queue_name}_done") do |done_queue|
+                    done_message = {
+                      'host_info' => host_info,
+                      'original' => message.body,
+                      'run_time' => run_time
+                    }
+                    logger.debug "Sending 'done' message to #{done_queue.name}"
+                    done_queue.send_message(encode_message(done_message))
+                  end
                 
                   logger.debug "Deleting message from queue"
                   message.delete()
                 end
               rescue Exception => e
-                error_message = {
-                  'error' => {
-                    'message' => e.message, 
-                    'class' => e.class.name
-                  }, 
-                  'host_info' => host_info,
-                  'original' => message.body
-                }
-                logger.error "Sending 'error' message to #{error_queue.name}: #{e.message}"
-                error_queue.send_message(encode_message(error_message))
+                with_queue("#{queue_name}_error") do |error_queue|
+                  error_message = {
+                    'error' => {
+                      'message' => e.message, 
+                      'class' => e.class.name
+                    }, 
+                    'host_info' => host_info,
+                    'original' => message.body
+                  }
+                  logger.error "Sending 'error' message to #{error_queue.name}: #{e.message}"
+                  error_queue.send_message(encode_message(error_message))
+                end
                 message.delete()
               end
             end
             sleep(settings['sleep'] || 5)
-          rescue Exception => e
-            logger.error "An error occurred while receiving from the waiting queue: #{e.message}"
-            # delay to try to get past the issue with the queue
-            sleep(30)
-            # assign a new queue instance
-            @waiting_queue = queue(waiting_queue.name)
           end
         end
         logger.debug "Exiting daemon thread"

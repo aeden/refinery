@@ -49,15 +49,13 @@ module Refinery #:nodoc:
     
     def run_heartbeat_monitor
       logger.info "Starting heartbeat monitor"
-      Thread.new(queue('heartbeat')) do |heartbeat_queue|
+      Thread.new('heartbeat') do |heartbeat_queue_name|
         loop do
-          begin
+          with_queue(heartbeat_queue_name) do |heartbeat_queue|
             while (message = heartbeat_queue.receive)
               logger.debug decode_message(message.body).inspect
               message.delete()
             end
-          rescue Exception => e
-            logger.error e
           end
           sleep(5)
         end
@@ -69,9 +67,9 @@ module Refinery #:nodoc:
         queue_name = settings['queue'] || key
         done_queue_name = "#{queue_name}_done"
         logger.debug "Starting monitor for queue #{done_queue_name}"
-        Thread.new(queue(done_queue_name)) do |done_queue|
+        Thread.new(done_queue_name) do |done_queue_name|
           loop do
-            begin
+            with_queue(done_queue_name) do |done_queue|
               while (message = done_queue.receive)
                 done_message = decode_message(message.body)
                 processed = decode_message(done_message['original'])
@@ -79,10 +77,8 @@ module Refinery #:nodoc:
                 message.delete()
                 statistics.record_done(done_message)
               end
-            rescue Exception => e
-              logger.error e
+              sleep(5)
             end
-            sleep(5)
           end
         end
       end
@@ -93,9 +89,9 @@ module Refinery #:nodoc:
         queue_name = settings['queue'] || key
         error_queue_name = "#{queue_name}_error"
         logger.info "Starting error monitor for queue #{error_queue_name}"
-        Thread.new(queue(error_queue_name)) do |error_queue|
+        Thread.new(error_queue_name) do |error_queue_name|
           loop do
-            begin
+            with(error_queue_name) do |error_queue|
               while (message = error_queue.receive)
                 error_message = decode_message(message.body)
                 processed = decode_message(error_message['original'])
@@ -103,8 +99,6 @@ module Refinery #:nodoc:
                 message.delete()
                 statistics.record_error(error_message)
               end
-            rescue Exception => e
-              logger.error e
             end
             sleep(5)
           end

@@ -60,19 +60,11 @@ module Refinery #:nodoc:
     
     private
     def execute_daemons
-      prefix = config['prefix'] || ''
+      queue_prefix = config['prefix'] || ''
       config['processors'].each do |key, settings|
         logger.debug "Creating daemons for #{key}"
-        
-        queue_name = settings['queue'] || key
-        queue_name = "#{prefix}#{queue_name}"
-        logger.debug "Using queue #{queue_name}"
-        waiting_queue = queue("#{queue_name}_waiting")
-        error_queue = queue("#{queue_name}_error")
-        done_queue = queue("#{queue_name}_done")
-        
         1.upto(settings['workers']['initial']) do
-          daemons << Refinery::Daemon.new(self, key, waiting_queue, error_queue, done_queue, settings)
+          daemons << Refinery::Daemon.new(self, key, queue_prefix, settings)
         end
         
         logger.debug "Running #{daemons.length} daemons"

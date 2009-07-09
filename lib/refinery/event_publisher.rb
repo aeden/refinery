@@ -51,9 +51,9 @@ module Refinery #:nodoc:
       raise RuntimeError, "No processor configuration found for #{key}" unless settings
       queue_name = settings['queue'] || key
       queue_name = "#{prefix}#{queue_name}"
-      logger.debug "Using queue #{queue_name}_waiting"
-      waiting_queue = queue("#{queue_name}_waiting")
-      load_publisher_class(key).new(waiting_queue).execute
+      waiting_queue_name = "#{queue_name}_waiting"
+      logger.debug "Using queue #{waiting_queue_name}"
+      load_publisher_class(key).new(waiting_queue_name).execute
     end
     
     # Run the event publisher
@@ -85,13 +85,13 @@ module Refinery #:nodoc:
         logger.info "Creating publisher for #{key}"
         queue_name = settings['queue'] || key
         queue_name = "#{prefix}#{queue_name}"
-        logger.debug "Using queue #{queue_name}_waiting"
-        waiting_queue = queue("#{queue_name}_waiting")
+        waiting_queue_name = "#{queue_name}_waiting"
+        logger.debug "Using queue #{waiting_queue_name}"
       
-        threads << Thread.new(waiting_queue, settings) do |waiting_queue, settings|
+        threads << Thread.new(waiting_queue_name, settings) do |waiting_queue_name, settings|
           while(running?)
             begin
-              load_publisher_class(key).new(waiting_queue).execute
+              load_publisher_class(key).new(waiting_queue_name).execute
             rescue Exception => e
               logger.error e
               raise e
