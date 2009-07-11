@@ -19,7 +19,11 @@ module Refinery #:nodoc:
         yield queue(name)
       rescue Exception => e
         logger.error "Queue error: #{e.message}"
-        @queue_provider = nil
+        # this removes the sqs connection from the current thread.
+        # note that this is brittle and will break if the RightAWS 
+        # library changes the name or the way the sqs connection is
+        # stored in the thread local hash
+        Thread.current[:sqs_connection] = nil
         sleep(5)
         retry
       end
