@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{refinery}
-  s.version = "0.9.15"
+  s.version = "0.10.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Anthony Eden"]
-  s.date = %q{2009-07-11}
+  s.date = %q{2009-07-13}
   s.description = %q{Process data in a distributed fashion.}
   s.email = %q{anthonyeden@gmail.com}
   s.executables = ["epub", "monitor", "pubnow", "refinery"]
@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
      "lib/refinery/heartbeat.rb",
      "lib/refinery/loggable.rb",
      "lib/refinery/monitor.rb",
+     "lib/refinery/processor.rb",
      "lib/refinery/publisher.rb",
      "lib/refinery/queueable.rb",
      "lib/refinery/server.rb",
@@ -58,6 +59,7 @@ Gem::Specification.new do |s|
      "test/unit/event_publisher_test.rb",
      "test/unit/heartbeat_test.rb",
      "test/unit/loggable_test.rb",
+     "test/unit/processor_test.rb",
      "test/unit/publisher_test.rb",
      "test/unit/queueable_test.rb",
      "test/unit/server_test.rb",
@@ -84,6 +86,7 @@ Gem::Specification.new do |s|
      "test/unit/event_publisher_test.rb",
      "test/unit/heartbeat_test.rb",
      "test/unit/loggable_test.rb",
+     "test/unit/processor_test.rb",
      "test/unit/publisher_test.rb",
      "test/unit/queueable_test.rb",
      "test/unit/server_test.rb",

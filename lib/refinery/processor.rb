@@ -35,6 +35,9 @@ module Refinery #:nodoc:
       
       ThreadsWait.all_waits(*daemons) do |daemon|
         puts "a #{daemon.name} just died"
+        daemons.remove(daemon)
+        puts "starting a new #{key} daemon"
+        daemons << Daemon.new(self, key, queue_prefix, settings)
       end
       
       logger.debug "Processor #{key} is exiting"
