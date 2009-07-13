@@ -74,7 +74,7 @@ module Refinery #:nodoc:
     def execute
       logger.debug "Running daemon thread: #{name} (settings: #{settings.inspect})"
       while(running?)
-        logger.debug "Checking #{queue_name}_waiting"
+        #logger.debug "Checking #{queue_name}_waiting"
         with_queue("#{queue_name}_waiting") do |waiting_queue|
           while (message = waiting_queue.receive(settings['visibility']))
             worker = load_worker_class(name).new(self)
