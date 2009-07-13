@@ -33,11 +33,14 @@ module Refinery #:nodoc:
       
       logger.debug "Running #{daemons.length} daemons"
       
-      ThreadsWait.all_waits(*daemons) do |daemon|
+      wait = ThreadsWait.new(*daemons)
+      wait.all_waits do |daemon|
         puts "a #{daemon.name} just died"
         daemons.remove(daemon)
         puts "starting a new #{key} daemon"
-        daemons << Daemon.new(self, key, queue_prefix, settings)
+        daemon = Daemon.new(self, key, queue_prefix, settings)
+        daemons << daemon
+        wait.join(daemon)
       end
       
       logger.debug "Processor #{key} is exiting"
