@@ -45,6 +45,8 @@ module Refinery
   
   # Require internal code files
   def self.require_internals
+    require 'thwait'
+    
     require 'refinery/loggable'
     require 'refinery/configurable'
     require 'refinery/queueable'
@@ -56,6 +58,7 @@ module Refinery
     require 'refinery/config'
     require 'refinery/heartbeat'
     require 'refinery/server'
+    require 'refinery/processor'
     require 'refinery/daemon'
     require 'refinery/worker'
     require 'refinery/event_publisher'

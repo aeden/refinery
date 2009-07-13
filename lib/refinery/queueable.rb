@@ -9,24 +9,9 @@ module Refinery #:nodoc:
     end
     
     # Given the queue name and a block, yield the named queue into 
-    # the block. This method handles any exceptions that are raised
-    # in the block and will recreate the provider automatically.
-    #
-    # Note that errors will not be propagated beyond this block. You
-    # have been warned.
+    # the block.
     def with_queue(name, &block)
-      begin
-        yield queue(name)
-      rescue Exception => e
-        logger.error "Queue error: #{e.message}"
-        # this removes the sqs connection from the current thread.
-        # note that this is brittle and will break if the RightAWS 
-        # library changes the name or the way the sqs connection is
-        # stored in the thread local hash
-        Thread.current[:sqs_connection] = nil
-        sleep(5)
-        retry
-      end
+      yield queue(name)
     end
     
     protected

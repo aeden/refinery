@@ -54,26 +54,21 @@ module Refinery #:nodoc:
     # Run the server
     def run
       logger.info "Starting Refinery server"
-      execute_daemons
+      execute_processors
       logger.info "Server is exiting"
     end
     
     private
-    def execute_daemons
-      queue_prefix = config['prefix'] || ''
-      config['processors'].each do |key, settings|
-        logger.debug "Creating daemons for #{key}"
-        1.upto(settings['workers']['initial']) do
-          daemons << Refinery::Daemon.new(self, key, queue_prefix, settings)
-        end
-        
-        logger.debug "Running #{daemons.length} daemons"
+    def execute_processors
+      
+      @processors = config['processors'].map do |key, settings|
+        Processor.new(self, key, settings)
       end
       
       Heartbeat.new(self)
       
       begin
-        daemons.each { |daemon| daemon.thread.join }
+        @processors.each { |p| p.join }
       rescue Interrupt => e
       end
     end

@@ -20,13 +20,7 @@ class ServerTest < Test::Unit::TestCase
     should "be runnable" do
       setup_default_config
       
-      heartbeat_queue = stub('heartbeat queue')
-      heartbeat_queue.stubs(:send_message)
-      queue_provider = stub('queue provider')
-      queue_provider.expects(:queue).with('heartbeat').returns(heartbeat_queue)
-      RightAws::SqsGen2.expects(:new).with(
-        'aki', 'sak', {:multi_thread => true}
-      ).returns(queue_provider)
+      Refinery::Heartbeat.expects(:new)
       
       assert_nothing_raised do
         thread = Thread.new do
