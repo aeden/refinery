@@ -36,7 +36,7 @@ module Refinery #:nodoc:
       wait = ThreadsWait.new(*daemons)
       wait.all_waits do |daemon|
         puts "a #{daemon.name} just died"
-        daemons.remove(daemon)
+        daemons.delete(daemon)
         puts "starting a new #{key} daemon"
         daemon = Daemon.new(self, key, queue_prefix, settings)
         daemons << daemon
