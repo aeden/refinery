@@ -99,7 +99,8 @@ module Refinery #:nodoc:
                 error_message = {
                   'error' => {
                     'message' => e.message, 
-                    'class' => e.class.name
+                    'class' => e.class.name,
+                    'backtrace' => e.backtrace
                   }, 
                   'host_info' => host_info,
                   'original' => message.body
