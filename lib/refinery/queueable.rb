@@ -11,7 +11,11 @@ module Refinery #:nodoc:
     # Given the queue name and a block, yield the named queue into 
     # the block.
     def with_queue(name, &block)
-      yield queue(name)
+      begin
+        yield queue(name)
+      rescue Exception => e
+        logger.error "An error occurred when communicating with queue #{name}: #{e}"
+      end
     end
     
     protected
