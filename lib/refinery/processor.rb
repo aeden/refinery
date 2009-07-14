@@ -35,9 +35,11 @@ module Refinery #:nodoc:
       
       wait = ThreadsWait.new(*daemons)
       wait.all_waits do |daemon|
-        puts "a #{daemon.name} just died"
+        logger.debug "a #{daemon.name} just died"
         daemons.delete(daemon)
-        puts "starting a new #{key} daemon"
+        logger.debug "waiting for 60 seconds before starting a new #{key} daemon"
+        sleep(60)
+        logger.debug "starting a new #{key} daemon"
         daemon = Daemon.new(self, key, queue_prefix, settings)
         daemons << daemon
         wait.join(daemon)
