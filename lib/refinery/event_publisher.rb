@@ -93,8 +93,7 @@ module Refinery #:nodoc:
             begin
               load_publisher_class(key).new(waiting_queue_name).execute
             rescue Exception => e
-              logger.error e
-              raise e
+              logger.error "Error running publisher: #{e.message}"
             end
           
             delay = settings['publishers']['delay'] || 60
