@@ -15,6 +15,7 @@ module Refinery #:nodoc:
         yield queue(name)
       rescue Exception => e
         logger.error "An error occurred when communicating with queue #{name}: #{e}"
+        sleep(30)
       end
     end
     
