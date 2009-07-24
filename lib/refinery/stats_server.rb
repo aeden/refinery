@@ -10,7 +10,7 @@ module Refinery #:nodoc:
         Ramaze::Log.loggers.clear # supress all Ramaze logging
         Ramaze.start              # start the Ramaze server on port 7000
       rescue NameError
-        self.logger.warn "Install Remaze to enable the stats server"
+        self.logger.warn "Install Ramaze to enable the stats server"
       end
     end
     

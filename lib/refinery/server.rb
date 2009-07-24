@@ -79,7 +79,7 @@ module Refinery #:nodoc:
       @format ||= "%s, [%s#%d][%s] %5s -- %s: %s\n"
     end
     def call(severity, time, progname, msg)
-      format % [severity[0..0], format_datetime(time), $$, Thread.current.object_id.to_s, severity, progname, msg.to_s]
+      format % [severity[0..0], format_datetime(time.utc), $$, Thread.current.object_id.to_s, severity, progname, msg.to_s]
     end
     def format_datetime(time)
       time.strftime("%Y-%m-%dT%H:%M:%S.") << "%06d " % time.usec

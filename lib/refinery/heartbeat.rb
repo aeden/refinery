@@ -8,10 +8,11 @@ module Refinery #:nodoc:
     
     # Initialize the heartbeat for the given server.
     def initialize(server)
+      queue_prefix = config['prefix'] || ''
       @server = server
       @thread = Thread.new do
         loop do
-          with_queue('heartbeat') do |heartbeat_queue|
+          with_queue("#{queue_prefix}heartbeat") do |heartbeat_queue|
             logger.debug "Send heartbeat"
             message = {
               'host_info' => host_info,
