@@ -27,7 +27,7 @@ require 'getoptlong'
 require 'rdoc/usage'
 require File.dirname(__FILE__) + '/../lib/refinery'
 
-pidfile = '/var/run/epub.pid'
+pidfile = 'epub.pid'
 
 options = {}
 opts = GetoptLong.new(
