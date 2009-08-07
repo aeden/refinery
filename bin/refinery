@@ -27,13 +27,16 @@ require 'getoptlong'
 require 'rdoc/usage'
 require File.dirname(__FILE__) + '/../lib/refinery'
 
+pidfile = '/var/run/refinery.pid'
+
 options = {}
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
   [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT],
   [ '--workers', '-w', GetoptLong::REQUIRED_ARGUMENT],
-  [ '--verbose', '-v', GetoptLong::NO_ARGUMENT]
+  [ '--verbose', '-v', GetoptLong::NO_ARGUMENT],
+  [ '--pidfile', GetoptLong::REQUIRED_ARGUMENT]
 )
 opts.each do |opt, arg|
   case opt
@@ -47,7 +50,15 @@ opts.each do |opt, arg|
     options[:workers] = arg
   when '--verbose'
     options[:verbose] = true
+  when '--pidfile'
+    pidfile = arg
   end
 end
 
+open(pidfile, 'w') do |f|
+  f << $$
+end
+
 Refinery::Server.new(options).run
+
+File.delete(pidfile)
