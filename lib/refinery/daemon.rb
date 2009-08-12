@@ -73,6 +73,13 @@ module Refinery #:nodoc:
     private
     def execute
       logger.debug "Running daemon thread: #{name} (settings: #{settings.inspect})"
+      
+      begin
+        require 'java'
+        java.lang.Thread.current_thread.name = "#{name} Daemon"
+      rescue LoadError => e
+      end
+      
       while(running?)
         #logger.debug "Checking #{queue_name}_waiting"
         with_queue("#{queue_name}_waiting") do |waiting_queue|

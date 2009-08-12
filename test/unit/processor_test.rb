@@ -13,6 +13,7 @@ class ProcessorTest < Test::Unit::TestCase
       @error_queue = stub('Queue(error)')
       @done_queue = stub('Queue(done)')
       
+      Refinery::Daemon.any_instance.stubs(:require).with('java').raises(LoadError)
       Refinery::Daemon.any_instance.stubs(:queue).with(
       'sample_waiting').returns(@waiting_queue)
       Refinery::Daemon.any_instance.stubs(:queue).with(

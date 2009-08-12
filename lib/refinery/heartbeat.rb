@@ -11,6 +11,12 @@ module Refinery #:nodoc:
       queue_prefix = config['prefix'] || ''
       @server = server
       @thread = Thread.new do
+        begin
+          require 'java'
+          java.lang.Thread.current_thread.name = 'Heartbeat'
+        rescue Exception => e
+        end
+        
         loop do
           with_queue("#{queue_prefix}heartbeat") do |heartbeat_queue|
             logger.debug "Send heartbeat"
