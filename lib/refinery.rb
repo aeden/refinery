@@ -34,13 +34,20 @@ module Refinery
   def self.require_optional_library(short_name, display_name)
     begin
       require short_name
+      puts "#{short_name} optional library was loaded"
+      true
     rescue LoadError
+      puts "#{short_name} optional library not loaded"
     end
   end
   
   def self.require_optional_libraries
     require_optional_library('sequel', 'Sequel gem')
     require_optional_library('ramaze', 'Ramaze')
+    
+    if require_optional_library('java', 'JRuby')
+      require_optional_library('typica', 'JRuby Typica wrapper')
+    end
   end
   
   # Require internal code files

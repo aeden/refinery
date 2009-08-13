@@ -11,10 +11,8 @@ module Refinery #:nodoc:
       queue_prefix = config['prefix'] || ''
       @server = server
       @thread = Thread.new do
-        begin
-          require 'java'
+        if defined?(java.lang.Thread)
           java.lang.Thread.current_thread.name = 'Heartbeat'
-        rescue Exception => e
         end
         
         loop do

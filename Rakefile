@@ -6,10 +6,10 @@ desc 'Default: run tests.'
 task :default => [:test]
 
 desc 'Run tests.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
+task :test do
+  Dir.glob('test/**/*_test.rb') do |f|
+    require f
+  end
 end
 
 desc 'Generate documentation.'

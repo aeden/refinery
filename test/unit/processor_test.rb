@@ -13,13 +13,15 @@ class ProcessorTest < Test::Unit::TestCase
       @error_queue = stub('Queue(error)')
       @done_queue = stub('Queue(done)')
       
-      Refinery::Daemon.any_instance.stubs(:require).with('java').raises(LoadError)
-      Refinery::Daemon.any_instance.stubs(:queue).with(
-      'sample_waiting').returns(@waiting_queue)
-      Refinery::Daemon.any_instance.stubs(:queue).with(
-      'sample_error').returns(@error_queue)
-      Refinery::Daemon.any_instance.stubs(:queue).with(
-      'sample_done').returns(@done_queue)
+      provider = stub('QueueProvider')
+      if defined?(Typica)
+        Typica::Sqs::QueueService.stubs(:new).returns(provider)
+      else
+        RightAws::SqsGen2.stubs(:new).returns(provider)
+      end
+      provider.stubs(:queue).with('sample_waiting').returns(@waiting_queue)
+      provider.stubs(:queue).with('sample_error').returns(@error_queue)
+      provider.stubs(:queue).with('sample_done').returns(@done_queue)
     end
     should "initialize" do
       assert_nothing_raised do

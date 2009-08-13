@@ -20,7 +20,7 @@ class ServerTest < Test::Unit::TestCase
     should "be runnable" do
       setup_default_config
       
-      Refinery::Heartbeat.expects(:new)
+      #Refinery::Heartbeat.expects(:new)
       
       assert_nothing_raised do
         thread = Thread.new do

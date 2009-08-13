@@ -9,11 +9,13 @@ class HeartbeatTest < Test::Unit::TestCase
       
       heartbeat_queue = stub('heartbeat queue')
       heartbeat_queue.stubs(:send_message)
-      queue_provider = stub('queue provider')
-      queue_provider.expects(:queue).with('heartbeat').returns(heartbeat_queue)
-      RightAws::SqsGen2.stubs(:new).with(
-        'aki', 'sak', {:multi_thread => true}
-      ).returns(queue_provider)
+      provider = stub('queue provider')
+      provider.stubs(:queue).with('heartbeat').returns(heartbeat_queue)
+      if defined?(Typica)
+        Typica::Sqs::QueueService.stubs(:new).returns(provider)
+      else
+        RightAws::SqsGen2.stubs(:new).returns(provider)
+      end
     end
     should "be initializable" do
       Refinery::Heartbeat.new(@server)

@@ -9,13 +9,15 @@ class DaemonTest < Test::Unit::TestCase
       @error_queue = stub('Queue(error)')
       @done_queue = stub('Queue(done)')
       
-      Refinery::Daemon.any_instance.stubs(:require).with('java').raises(LoadError)
-      Refinery::Daemon.any_instance.stubs(:queue).with(
-      'sample_waiting').returns(@waiting_queue)
-      Refinery::Daemon.any_instance.stubs(:queue).with(
-      'sample_error').returns(@error_queue)
-      Refinery::Daemon.any_instance.stubs(:queue).with(
-      'sample_done').returns(@done_queue)
+      @provider = stub('QueueProvider')
+      if defined?(Typica)
+        Typica::Sqs::QueueService.stubs(:new).returns(@provider)
+      else
+        RightAws::SqsGen2.stubs(:new).returns(@provider)
+      end
+      @provider.stubs(:queue).with('sample_waiting').returns(@waiting_queue)
+      @provider.stubs(:queue).with('sample_error').returns(@error_queue)
+      @provider.stubs(:queue).with('sample_done').returns(@done_queue)
     end
     should "be startable" do
       @waiting_queue.stubs(:receive)
@@ -29,12 +31,12 @@ class DaemonTest < Test::Unit::TestCase
       assert_not_nil daemon.logger
     end
     should "allow visibility setting" do
-      @waiting_queue.expects(:receive).with(600)
+      @waiting_queue.stubs(:receive).with(600)
       daemon = Refinery::Daemon.new(@processor, 'sample', '', {'visibility' => 600})
     end
     should "have a queue name" do
       @waiting_queue.stubs(:receive)
-      Refinery::Daemon.any_instance.expects(:queue).with(
+      @provider.stubs(:queue).with(
       'prefix_sample_waiting').returns(@waiting_queue)
       daemon = Refinery::Daemon.new(@processor, 'sample', 'prefix_')
       assert_equal 'prefix_sample', daemon.queue_name

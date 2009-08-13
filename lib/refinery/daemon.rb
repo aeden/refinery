@@ -74,10 +74,8 @@ module Refinery #:nodoc:
     def execute
       logger.debug "Running daemon thread: #{name} (settings: #{settings.inspect})"
       
-      begin
-        require 'java'
+      if defined?(java.lang.Thread)
         java.lang.Thread.current_thread.name = "#{name} Daemon"
-      rescue LoadError => e
       end
       
       while(running?)

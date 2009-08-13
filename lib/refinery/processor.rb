@@ -26,10 +26,8 @@ module Refinery #:nodoc:
     def execute
       queue_prefix = config['prefix'] || ''
       
-      begin
-        require 'java'
+      if defined?(java.lang.Thread)
         java.lang.Thread.current_thread.name = "#{key} Processor"
-      rescue Exception => e
       end
       
       logger.debug "Creating daemons for #{key}"
