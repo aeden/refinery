@@ -35,7 +35,7 @@ module Refinery #:nodoc:
     # Publish the given message to the queue. The message will be converted 
     # to JSON and pushed into the queue associated with the publisher.
     def publish_to_queue(queue, message)
-      logger.debug "Publisher #{self.class.name} sending message: #{message.to_json} to queue #{queue.url}"
+      logger.debug "Publisher #{self.class.name} sending message: #{message.to_json}"
       queue.send_message(Base64.encode64(message.to_json))
     end
   end
