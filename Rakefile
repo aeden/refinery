@@ -32,6 +32,7 @@ begin
     gemspec.description = "Process data in a distributed fashion."
     gemspec.authors = ["Anthony Eden"]
     gemspec.files.exclude 'docs/**/*'
+    gemspec.files.exclude '.autotest'
     gemspec.rubyforge_project = 'refinery'
   end
 rescue LoadError
