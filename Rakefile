@@ -34,6 +34,9 @@ begin
     gemspec.files.exclude 'docs/**/*'
     gemspec.files.exclude '.autotest'
     gemspec.rubyforge_project = 'refinery'
+    gemspec.add_dependency "right_aws"
+    gemspec.add_dependency "moneta"
+    gemspec.add_dependency "addressable"
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
