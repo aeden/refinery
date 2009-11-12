@@ -48,6 +48,8 @@ module Refinery
     if require_optional_library('java', 'JRuby')
       require_optional_library('typica', 'JRuby Typica wrapper')
     end
+    
+    require_optional_library('beanstalk-client', 'Beanstalk Client')
   end
   
   # Require internal code files
@@ -74,6 +76,10 @@ module Refinery
     require 'refinery/statistics'
     require 'refinery/stats_server'
     
+    if defined?(Beanstalk)
+      require 'refinery/beanstalk_queue'
+      require 'refinery/beanstalk_queue_provider'
+    end
   end
   
   # Raised if a source file cannot be loaded

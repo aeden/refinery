@@ -14,7 +14,8 @@ module Refinery #:nodoc:
       begin
         yield queue(name)
       rescue Exception => e
-        logger.error "An error occurred when communicating with queue #{name}: #{e}"
+        logger.error "An error occurred when communicating with queue #{name}: #{e.message}"
+        puts e.backtrace.map { |t| "\t#{t}" }.join("\n")
         sleep(30)
       end
     end
@@ -23,17 +24,21 @@ module Refinery #:nodoc:
     # Get the queue provider. Defaults to RightAws::SqsGen2 running
     # in multi-thread mode.
     def queue_provider
-      if defined?(Typica)
-        @queue_provider ||= Typica::Sqs::QueueService.new(
-          config['aws']['credentials']["access_key_id"], 
-          config['aws']['credentials']["secret_access_key"]
-        )
+      if config['queue_engine'] == 'beanstalk' && defined?(Beanstalk)
+        @queue_provider ||= Refinery::BeanstalkQueueProvider.new
       else
-        @queue_provider ||= RightAws::SqsGen2.new(
-          config['aws']['credentials']["access_key_id"], 
-          config['aws']['credentials']["secret_access_key"],
-          {:multi_thread => true}
-        )
+        if defined?(Typica)
+          @queue_provider ||= Typica::Sqs::QueueService.new(
+            config['aws']['credentials']["access_key_id"], 
+            config['aws']['credentials']["secret_access_key"]
+          )
+        else
+          @queue_provider ||= RightAws::SqsGen2.new(
+            config['aws']['credentials']["access_key_id"], 
+            config['aws']['credentials']["secret_access_key"],
+            {:multi_thread => true}
+          )
+        end
       end
     end
   end
