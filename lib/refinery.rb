@@ -22,7 +22,6 @@ module Refinery
   
   # Require all of the dependencies.
   def self.require_libraries
-    require_library('rubygems', 'Rubygems')
     require_library('right_aws', 'RightScale AWS gem')
     require_library('json', 'JSON gem')
     require_library('moneta', 'Moneta gem')
