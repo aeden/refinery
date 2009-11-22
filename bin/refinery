@@ -25,7 +25,7 @@
 
 require 'getoptlong'
 require 'rdoc/usage'
-require File.dirname(__FILE__) + '/../lib/refinery'
+require 'refinery'
 
 pidfile = 'refinery.pid'
 

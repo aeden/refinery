@@ -1,6 +1,7 @@
 module Refinery #:nodoc:
   # The StatsServer class provides a build in web server that provides
-  # a view into the refinery statistics.
+  # a view into the refinery statistics. This functionality is very
+  # experimental.
   class StatsServer
     include Refinery::Loggable
     

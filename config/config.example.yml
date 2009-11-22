@@ -2,6 +2,8 @@ aws:
   credentials:
     access_key_id: "access_key_id"
     secret_access_key: "secret_access_key"
+# queue_engine: 
+#   provider: 'beanstalk'
 prefix: 'example_'
 processors:
   sample:

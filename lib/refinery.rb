@@ -1,7 +1,5 @@
 $KCODE="UTF8"
 
-$:.unshift(File.dirname(__FILE__))
-
 require 'logger'
 require 'socket'
 require 'benchmark'
