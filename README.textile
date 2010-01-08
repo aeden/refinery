@@ -48,3 +48,7 @@ Example: bin/pubnow -c config/config.yml sample
 h3. bin/monitor
 
 This command is used to run the monitor system. The monitor system tracks the health of the refinery. The monitor should only be run on a single host.
+
+h2. Tests
+
+To run the tests either use the command `rake` or run by hand with `ruby -Ilib -Itest unit/test_to_run.rb`

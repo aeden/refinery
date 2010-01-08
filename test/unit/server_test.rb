@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
+
 class ServerTest < Test::Unit::TestCase
   context "the server class" do
     should "provide a logger" do

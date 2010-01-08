@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 if defined?(Sequel)
   class StatisticsTest < Test::Unit::TestCase

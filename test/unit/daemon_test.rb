@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
+
 class DaemonTest < Test::Unit::TestCase
   context "a daemon" do
     setup do

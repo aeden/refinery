@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
+
 class EventPublisherTest < Test::Unit::TestCase
   context "an event publisher" do
     should "raise an error if credentials are not set" do

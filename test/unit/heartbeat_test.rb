@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
+
 class HeartbeatTest < Test::Unit::TestCase
   context "a heartbeat" do
     setup do

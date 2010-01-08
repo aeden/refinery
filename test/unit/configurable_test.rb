@@ -1,7 +1,9 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
+
 class ConfigureMe
   include Refinery::Configurable
 end
+
 class ConfigurableTest < Test::Unit::TestCase
   context "a class with the configurable module" do
     should "provide a config" do
