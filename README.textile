@@ -51,4 +51,8 @@ This command is used to run the monitor system. The monitor system tracks the he
 
 h2. Tests
 
-To run the tests either use the command `rake` or run by hand with `ruby -Ilib -Itest unit/test_to_run.rb`
+To run the tests, do one of the following:
+
+* Use autotest
+* Use the command `rake`
+* Run by hand with `ruby -Ilib -Itest unit/test_to_run.rb`

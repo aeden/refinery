@@ -45,6 +45,14 @@ This command executes a single publisher once.
 
 Example: bin/pubnow -c config/config.yml sample
 
+== Tests
+
+To run the tests, do one of the following:
+
+* Use autotest
+* Use the command `rake`
+* Run by hand with `ruby -Ilib -Itest unit/test_to_run.rb`
+
 === bin/monitor
 
 This command is used to run the monitor system. The monitor system tracks the health of the refinery. The monitor should only be run on a single host.
